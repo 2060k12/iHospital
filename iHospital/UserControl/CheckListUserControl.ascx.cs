@@ -18,14 +18,34 @@ namespace iHospital
         public string QuestionText
         {
             get { return questionValueLabel.Text; }
-            set { questionValueLabel.Text = value; }
+            set { questionValueLabel.Text = value ; }
         }
 
-        public void SetCheckBoxListItems(string[] items)
+        public void SetCheckBoxListItems(List<KeyValuePair<string, int>> items)
         {
             optionsCheckBoxList.DataSource = items;
+            optionsCheckBoxList.DataTextField = "Key";   // The text displayed in the CheckBoxList
+            optionsCheckBoxList.DataValueField = "Value"; // The value associated with the item
             optionsCheckBoxList.DataBind();
         }
 
+
+
+        public List<KeyValuePair<string, int>> GetCheckBoxListItems()
+        {
+            List<KeyValuePair<string, int>> selectedItems = new List<KeyValuePair<string, int>>();
+            foreach (ListItem item in optionsCheckBoxList.Items)
+            {
+                if (item.Selected)
+                {
+                    selectedItems.Add(new KeyValuePair<string, int>(
+                        item.Text,
+                        Convert.ToInt32(item.Value)
+                    ));
+                }
+            }
+
+            return selectedItems;
+        }
     }
 }

@@ -20,10 +20,24 @@ namespace iHospital.UserControl
             set { radioQuestionLabel.Text = value; }
         }
 
-        public void SetCheckBoxListItems(string[] items)
+        public void SetChooseBoxListItems(List<KeyValuePair<string, int>> items)
         {
             radioList.DataSource = items;
+            radioList.DataTextField = "Key";   // The text displayed in the RadioButtonList
+            radioList.DataValueField = "Value"; // The value associated with the item
             radioList.DataBind();
+        }
+
+        public KeyValuePair<string, int>? GetChooseBoxListItems()
+        {
+            if (radioList.SelectedItem != null)
+            {
+                return new KeyValuePair<string, int>(
+                    radioList.SelectedItem.Text,
+                    Convert.ToInt32(radioList.SelectedItem.Value)
+                );
+            }
+            return null;
         }
     }
 }

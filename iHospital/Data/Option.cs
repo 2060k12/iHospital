@@ -10,5 +10,6 @@ namespace iHospital.Data
         public int Id { get; set; }
         public int QuestionId { get; set; }
         public string Option_Value { get; set; }
+        
     }
 }

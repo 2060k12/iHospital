@@ -22,7 +22,7 @@
             <asp:Button ID="previousButton" runat="server" Text="Previous" OnClick="previousButton_Click" CausesValidation="false" UseSubmitBehavior="false"/>
             <asp:Button ID="nextButton" runat="server" Text="Next" OnClick="nextButton_Click" CausesValidation="false" UseSubmitBehavior="False" />
 
-            <asp:Button ID="StartSurveyButton" runat="server" Text="Start Survey" />
+            <asp:Button ID="StartSurveyButton" runat="server" Text="Submit" OnClick="StartSurveyButton_Click" CausesValidation="false" UseSubmitBehavior="False" />
         </div>
     </form>
 </body>

@@ -76,6 +76,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\Answer.cs" />
+    <Compile Include="Data\DependentQuestion.cs" />
     <Compile Include="Data\Option.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Data\Question.cs" />

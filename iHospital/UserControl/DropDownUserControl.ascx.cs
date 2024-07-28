@@ -21,10 +21,25 @@ namespace iHospital.UserControl
             set { dropDownQuestionName.Text = value; }
         }
 
-        public void SetCheckBoxListItems(string[] items)
+        public void SetDropDownListItems(List<KeyValuePair<string, int>> items)
         {
             dropDownListUC.DataSource = items;
+            dropDownListUC.DataTextField = "Key";   // The text displayed in the RadioButtonList
+            dropDownListUC.DataValueField = "Value"; // The value associated with the item
             dropDownListUC.DataBind();
+        }
+
+
+        public KeyValuePair<string, int>? GetDropDownListSelectedItem()
+        {
+            if (dropDownListUC.SelectedItem != null)
+            {
+                return new KeyValuePair<string, int>(
+                    dropDownListUC.SelectedItem.Text,
+                    Convert.ToInt32(dropDownListUC.SelectedItem.Value)
+                );
+            }
+            return null;
         }
     }
 }
