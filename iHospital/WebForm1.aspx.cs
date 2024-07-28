@@ -1,6 +1,11 @@
-﻿using iHospital.UserControl;
+﻿using iHospital.Data;
+using iHospital.UserControl;
 using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.EnterpriseServices;
+using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -10,11 +15,34 @@ namespace iHospital
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (!IsPostBack)
+             LoadQuestions();
+
+                DisplayCurrentQuestion();
+            
+        }
+
+        // list of questions
+        // FIrst list "question" will hold the list of questions that are not optional and "optionalQuestions" will hold optional questions
+        List<Question> questions = new List<Question>();
+        List<Question> optionalQuestions = new List<Question>();
+
+
+
+ // Current Questions 
+        private int currentQuestionNumber
+        {
+            get
             {
-                LoadQuestions();
+                return (int)(ViewState["CurrentQuestionNumber"] ?? 0);
+            }
+            set
+            {
+                ViewState["CurrentQuestionNumber"] = value;
             }
         }
+
+        // list of all options
+        List<Option> options = new List<Option>();
 
         private void LoadQuestions()
         {
@@ -25,59 +53,48 @@ namespace iHospital
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-                    string query = "SELECT * from Question";
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+
+                    // Load questions
+                    string questionQuery = "SELECT * FROM Question";
+                    using (SqlCommand cmd = new SqlCommand(questionQuery, conn))
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
-                        {   
-                            switch (reader["question_type"].ToString())
+                        {
+                            Question tempQuestion = new Question
                             {
+                                Id = Convert.ToInt32(reader["id"]),
+                                QuestionText = reader["question"].ToString(),
+                                QuestionType = reader["question_type"].ToString(),
+                                QuestionOrder = Convert.ToInt32(reader["question_order"])
+                            };
 
-                                // if the question type of "choose_one" this user control will work
-                                case "choose_one":
-                                    ChooseUserControl chooseList = (ChooseUserControl)LoadControl("~/UserControl/ChooseUserControl.ascx");
-                                    chooseList.QuestionText = reader["question"].ToString();
-                                    string[] items = { "Item 1", "Item 2", "Item 3" };
-                                    chooseList.SetCheckBoxListItems(items);
-                                    questionContainer.Controls.Add(chooseList);
-                                    break;
-
-
-                                // if the question type of "drop_down" this user control will work
-
-                                case "drop_down":
-                                    DropDownUserControl dropDown = (DropDownUserControl)LoadControl("~/UserControl/DropDownUserControl.ascx");
-                                    dropDown.QuestionText = reader["question"].ToString();
-                                    string[] items1 = { "Item 1", "Item 2", "Item 3" };
-    
-                                    dropDown.SetCheckBoxListItems(items1);
-                                    questionContainer.Controls.Add(dropDown);
-                                    break;
-
-                                // if the question type of "select" this user control will work
-
-                                case "select":
-                                    CheckListControl checkList = (CheckListControl)LoadControl("~/UserControl/CheckListUserControl.ascx");
-                                    checkList.QuestionText = reader["question"].ToString();
-                                    string[] items3 = { "Item 1", "Item 2", "Item 3" };
-                                    checkList.SetCheckBoxListItems(items3);
-                                    questionContainer.Controls.Add(checkList);
-                                    break;
-
-
-                                    // if the question type of "input" this user control will work
-                                case "input":
-                                    InputUserControl inputControl = (InputUserControl)LoadControl("~/UserControl/InputUserControl.ascx");
-                                    inputControl.QuestionText = reader["question"].ToString();
-                                    string input = inputControl.TextFieldText;
-                                    questionContainer.Controls.Add(inputControl);
-                                    break;
-
+                            if (tempQuestion.QuestionOrder != 0)
+                            {
+                                questions.Add(tempQuestion);
+                                questions.Sort((x, y) => x.QuestionOrder.CompareTo(y.QuestionOrder));
                             }
+                            else
+                            {
+                                optionalQuestions.Add(tempQuestion);
+                            }
+                        }
+                    }
 
-
-                           
+                    // Load options
+                    string optionQuery = "SELECT * FROM [Option]";
+                    using (SqlCommand cmd = new SqlCommand(optionQuery, conn))
+                    using (SqlDataReader optionReader = cmd.ExecuteReader())
+                    {
+                        while (optionReader.Read())
+                        {
+                            Option tempOption = new Option
+                            {
+                                Id = Convert.ToInt32(optionReader["id"]),
+                                QuestionId = Convert.ToInt32(optionReader["question_id"]),
+                                Option_Value = optionReader["option_value"].ToString()
+                            };
+                            options.Add(tempOption);
                         }
                     }
                 }
@@ -86,11 +103,88 @@ namespace iHospital
             {
                 // Log the error
                 System.Diagnostics.Debug.WriteLine("Error: " + ex.Message);
+            }
 
-                // Display a user-friendly error message
-                // Assuming you have a label for error messages in your ASPX page
-              
+            
+
+        }
+        private void DisplayCurrentQuestion()
+        {
+            PlaceHolder1.Controls.Clear();
+            if (currentQuestionNumber >=0 && currentQuestionNumber < questions.Count)
+            {
+                Question currentQuestion = questions[currentQuestionNumber];
+                string[] items = options
+                    .Where(o => o.QuestionId == currentQuestion.Id)
+                    .Select(o => o.Option_Value)
+                    .ToArray();
+
+                Control questionControl = null;
+
+                switch (currentQuestion.QuestionType)
+                {
+                    case "choose_one":
+                        ChooseUserControl chooseList = (ChooseUserControl)LoadControl("~/UserControl/ChooseUserControl.ascx");
+                        chooseList.QuestionText = currentQuestion.QuestionText;
+                        chooseList.SetCheckBoxListItems(items);
+                        //questionContainer.Controls.Add(chooseList);
+                        questionControl = chooseList;
+
+                        break;
+
+                    case "drop_down":
+                        DropDownUserControl dropDown = (DropDownUserControl)LoadControl("~/UserControl/DropDownUserControl.ascx");
+                        dropDown.QuestionText = currentQuestion.QuestionText;
+                        dropDown.SetCheckBoxListItems(items);
+                        //questionContainer.Controls.Add(dropDown);
+                        questionControl = dropDown;
+                        break;
+
+                    case "select":
+                        CheckListControl checkList = (CheckListControl)LoadControl("~/UserControl/CheckListUserControl.ascx");
+                        checkList.QuestionText = currentQuestion.QuestionText;
+                        checkList.SetCheckBoxListItems(items);
+                        //questionContainer.Controls.Add(checkList);
+                        questionControl = checkList;
+                        break;
+
+                    case "input":
+                        InputUserControl inputControl = (InputUserControl)LoadControl("~/UserControl/InputUserControl.ascx");
+                        inputControl.QuestionText = currentQuestion.QuestionText;
+                        //questionContainer.Controls.Add(inputControl);
+                        questionControl = inputControl;
+                        break;
+                }
+                if (questionControl != null)
+                {
+                    PlaceHolder1.Controls.Add(questionControl);
+                }
+
             }
         }
+
+        protected void previousButton_Click(object sender, EventArgs e)
+        {
+            if(currentQuestionNumber > 0)
+            {
+                currentQuestionNumber--;
+                DisplayCurrentQuestion();
+            }
+        }
+
+        protected void nextButton_Click(object sender, EventArgs e)
+        {
+               if(currentQuestionNumber < questions.Count - 1)
+            {
+                currentQuestionNumber++;
+                DisplayCurrentQuestion();
+            }
+        }
+
+
+
+
+
+       
     }
 }
