@@ -15,15 +15,17 @@ namespace iHospital
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (!IsPostBack)
+            {
                 LoadQuestions();
-                DisplayCurrentQuestion();
+            }
+            DisplayCurrentQuestion();
         }
 
         // list of questions
         // FIrst list "question" will hold the list of questions that are not optional and "optionalQuestions" will hold optional questions
-        List<Question> questions = new List<Question>();
-        List<Question> optionalQuestions = new List<Question>();
-        List<DependentQuestion> dependentQuestions = new List<DependentQuestion>();
+        //List<Question> optionalQuestions = new List<Question>();
+        //List<DependentQuestion> dependentQuestions = new List<DependentQuestion>();
         private List<Answer> answers
         {
             get
@@ -40,6 +42,70 @@ namespace iHospital
             }
         }
 
+        private List<Question> questions
+        {
+            get
+            {
+                if (ViewState["Questions"] == null)
+                {
+                    ViewState["Questions"] = new List<Question>();
+                }
+                return (List<Question>)ViewState["Questions"];
+            }
+            set
+            {
+                ViewState["Questions"] = value;
+            }
+        }
+
+        private List<Question> optionalQuestions
+        {
+            get
+            {
+                if (ViewState["OptionalQuestions"] == null)
+                {
+                    ViewState["OptionalQuestions"] = new List<Question>();
+                }
+                return (List<Question>)ViewState["OptionalQuestions"];
+            }
+            set
+            {
+                ViewState["OptionalQuestions"] = value;
+            }
+        }
+
+        private List<DependentQuestion> dependentQuestions
+        {
+            get
+            {
+                if (ViewState["DependentQuestions"] == null)
+                {
+                    ViewState["DependentQuestions"] = new List<DependentQuestion>();
+                }
+                return (List<DependentQuestion>)ViewState["DependentQuestions"];
+            }
+            set
+            {
+                ViewState["DependentQuestions"] = value;
+            }
+        }
+
+        private List<Option> options
+        {
+            get
+            {
+                if (ViewState["Options"] == null)
+                {
+                    ViewState["Options"] = new List<Option>();
+                }
+                return (List<Option>)ViewState["Options"];
+            }
+            set
+            {
+                ViewState["Options"] = value;
+            }
+        }
+
 
         // Current Questions 
         private int currentQuestionNumber
@@ -53,10 +119,6 @@ namespace iHospital
                 ViewState["CurrentQuestionNumber"] = value;
             }
         }
-
-        // list of all options
-        List<Option> options = new List<Option>();
-
         private void LoadQuestions()
         {
             string connectionString = "Data Source=SQL5111.site4now.net;Initial Catalog=db_9ab8b7_224dda12275;User Id=db_9ab8b7_224dda12275_admin;Password=vWHVw5VW";
@@ -112,7 +174,7 @@ namespace iHospital
                     }
 
 
-                    // Load options
+                    // Load dependent questions
                     string dependentQuery = "SELECT * FROM Contingent_Questions";
                     using (SqlCommand cmd = new SqlCommand(dependentQuery, conn))
                     using (SqlDataReader dependentReader = cmd.ExecuteReader())
@@ -206,75 +268,86 @@ namespace iHospital
 
         protected void nextButton_Click(object sender, EventArgs e)
         {
-               if(currentQuestionNumber < questions.Count - 1)
+
+            Answer answer = new Answer();
+
+            if (PlaceHolder1.Controls.Count > 0)
+            {
+                var control = PlaceHolder1.Controls[0];
+                if (control is ChooseUserControl)
+                {
+                    var chooseControl = (ChooseUserControl)control;
+                    var selectedOption = chooseControl.GetChooseBoxListItems();
+                    if (selectedOption != null)
+                    {
+                        answer.OptionId = selectedOption.Value.Value;
+                        answer.QuestionId = questions[currentQuestionNumber].Id;
+                        answers.Add(answer);
+                    }
+                }
+                else if (control is DropDownUserControl)
+                {
+                    var dropDownControl = (DropDownUserControl)control;
+                    var selectedOption = dropDownControl.GetDropDownListSelectedItem();
+                    if (selectedOption != null)
+                    {
+                        answer.OptionId = selectedOption.Value.Value;
+                        answer.QuestionId = questions[currentQuestionNumber].Id;
+                        answers.Add(answer);
+                    }
+                }
+                else if (control is CheckListControl)
+                {
+                    var checkListControl = (CheckListControl)control;
+                    var selectedOptions = checkListControl.GetCheckBoxListItems();
+                    if (selectedOptions.Count > 0)
+                    {
+                        foreach (var item in selectedOptions)
+                        {
+                            answer.OptionId = item.Value;
+                            answer.QuestionId = questions[currentQuestionNumber].Id;
+                            answers.Add(answer);
+                        }
+                    }
+                }
+                else if (control is InputUserControl)
+                {
+                    var inputControl = (InputUserControl)control;
+                    answer.OptionId = 0;
+                    answer.QuestionId = questions[currentQuestionNumber].Id;
+                    answer.AnswerText = inputControl.TextFieldText;
+                    answers.Add(answer);
+                }
+            }
+
+            if (dependentQuestions.Count > 0)
+            {
+                foreach (var item in dependentQuestions)
+                {
+                    if (item.OptionID == answer.OptionId)
+                    {
+                        questions.Insert(currentQuestionNumber + 1, optionalQuestions.Find(ques => ques.Id == item.QuestionId));
+                        DisplayCurrentQuestion();
+                    }
+                }
+            }
+            if (currentQuestionNumber < questions.Count - 1)
             {
                 currentQuestionNumber++;
                 DisplayCurrentQuestion();
 
-                Answer answer = new Answer();
-                
-                if(PlaceHolder1.Controls.Count > 0)
-                {
-                    var control = PlaceHolder1.Controls[0];
-                    if(control is ChooseUserControl)
-                    {
-                        var chooseControl = (ChooseUserControl)control;
-                        var selectedOption = chooseControl.GetChooseBoxListItems();
-                        if(selectedOption != null)
-                        {
-                            answer.OptionId = selectedOption.Value.Value;
-                            answer.QuestionId = questions[currentQuestionNumber].Id;
-                            answers.Add(answer);
-                        }
-                    }
-                    else if(control is DropDownUserControl)
-                    {
-                        var dropDownControl = (DropDownUserControl)control;
-                        var selectedOption = dropDownControl.GetDropDownListSelectedItem();
-                        if(selectedOption != null)
-                        {
-                            answer.OptionId = selectedOption.Value.Value;
-                            answer.QuestionId = questions[currentQuestionNumber].Id;
-                            answers.Add(answer);
-                        }
-                    }
-                    else if(control is CheckListControl)
-                    {
-                        var checkListControl = (CheckListControl)control;
-                        var selectedOptions = checkListControl.GetCheckBoxListItems();
-                        if(selectedOptions.Count > 0)
-                        {
-                            foreach (var item in selectedOptions)
-                            {
-                                answer.OptionId = item.Value ;
-                                answer.QuestionId = questions[currentQuestionNumber].Id;
-                                answers.Add(answer);
-                            }
-                        }
-                    }
-                    else if(control is InputUserControl)
-                    {
-                        var inputControl = (InputUserControl)control;
-                        answer.OptionId = 0;
-                        answer.QuestionId = questions[currentQuestionNumber].Id;
-                        answer.AnswerText = inputControl.TextFieldText;
-                        answers.Add(answer);
-                    }
-                }
-
-                if(dependentQuestions.Count > 0)
-                {
-                    foreach (var item in dependentQuestions)
-                    {
-                        if( item.OptionID == answer.OptionId)
-                        {
-                            questions.Insert(currentQuestionNumber + 1, optionalQuestions.Find(ques => ques.Id == item.QuestionId));
-                            DisplayCurrentQuestion();
-                        }      
-                    }
-                }
+               
                
             }
+
+            
+                        for(int i = 0; i < answers.Count; i++)
+                        {
+                System.Diagnostics.Debug.WriteLine(answers[i].QuestionId);
+                System.Diagnostics.Debug.WriteLine(answers[i].OptionId);
+                System.Diagnostics.Debug.WriteLine(answers[i].AnswerText);
+
+                        }
         }
 
         private void SaveAnswerToDatabase(Answer answer)
@@ -294,6 +367,8 @@ namespace iHospital
                         cmd.Parameters.AddWithValue("@answer", (object)answer.AnswerText ?? DBNull.Value);
                         cmd.Parameters.AddWithValue("@RespondantId", 1);
                         cmd.ExecuteNonQuery();
+
+
                     }
                 }
             }

@@ -22,7 +22,7 @@ namespace iHospital.UserControl
 
         public string TextFieldText
         {
-            get { return textBox.Text; }
+            get { return textBox.Text.ToString(); }
             set { textBox.Text = value; }
         }
         

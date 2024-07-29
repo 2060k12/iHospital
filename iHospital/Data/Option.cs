@@ -5,6 +5,8 @@ using System.Web;
 
 namespace iHospital.Data
 {
+    [Serializable]
+
     public class Option
     {
         public int Id { get; set; }

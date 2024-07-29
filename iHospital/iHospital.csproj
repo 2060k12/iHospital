@@ -67,19 +67,53 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Admin.aspx" />
+    <Content Include="Homepage.aspx" />
+    <Content Include="Login.aspx" />
+    <Content Include="Register.aspx" />
     <Content Include="UserControl\CheckListUserControl.ascx" />
     <Content Include="UserControl\ChooseUserControl.ascx" />
     <Content Include="UserControl\InputUserControl.ascx" />
     <Content Include="UserControl\DropDownUserControl.ascx" />
     <Content Include="Web.config" />
-    <Content Include="WebForm1.aspx" />
+    <Content Include="Survey.aspx" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Admin.aspx.cs">
+      <DependentUpon>Admin.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin.aspx.designer.cs">
+      <DependentUpon>Admin.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Data\Answer.cs" />
     <Compile Include="Data\DependentQuestion.cs" />
     <Compile Include="Data\Option.cs" />
+    <Compile Include="Data\Respondant.cs" />
+    <Compile Include="Homepage.aspx.cs">
+      <DependentUpon>Homepage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Homepage.aspx.designer.cs">
+      <DependentUpon>Homepage.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Login.aspx.cs">
+      <DependentUpon>Login.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Login.aspx.designer.cs">
+      <DependentUpon>Login.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Data\Question.cs" />
+    <Compile Include="Register.aspx.cs">
+      <DependentUpon>Register.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Register.aspx.designer.cs">
+      <DependentUpon>Register.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Repository\Repository.cs" />
     <Compile Include="UserControl\CheckListUserControl.ascx.cs">
       <DependentUpon>CheckListUserControl.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -108,12 +142,12 @@
     <Compile Include="UserControl\DropDownUserControl.ascx.designer.cs">
       <DependentUpon>DropDownUserControl.ascx</DependentUpon>
     </Compile>
-    <Compile Include="WebForm1.aspx.cs">
-      <DependentUpon>WebForm1.aspx</DependentUpon>
+    <Compile Include="Survey.aspx.cs">
+      <DependentUpon>Survey.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="WebForm1.aspx.designer.cs">
-      <DependentUpon>WebForm1.aspx</DependentUpon>
+    <Compile Include="Survey.aspx.designer.cs">
+      <DependentUpon>Survey.aspx</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="WebForm1.aspx.cs" Inherits="iHospital.WebForm1" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Survey.aspx.cs" Inherits="iHospital.WebForm1" %>
 <%--<%@ Register Src ="~/UserControl/CheckListUserControl.ascx" TagPrefix="uc" TagName="CheckList" %>
 <%@ Register Src ="~/UserControl/ChooseUserControl.ascx" TagPrefix="uc" TagName="ChooseList" %>
 <%@ Register Src ="~/UserControl/DropDownUserControl.ascx" TagPrefix="uc" TagName="DropDownList" %>
@@ -21,7 +21,6 @@
             </div>
             <asp:Button ID="previousButton" runat="server" Text="Previous" OnClick="previousButton_Click" CausesValidation="false" UseSubmitBehavior="false"/>
             <asp:Button ID="nextButton" runat="server" Text="Next" OnClick="nextButton_Click" CausesValidation="false" UseSubmitBehavior="False" />
-
             <asp:Button ID="StartSurveyButton" runat="server" Text="Submit" OnClick="StartSurveyButton_Click" CausesValidation="false" UseSubmitBehavior="False" />
         </div>
     </form>
