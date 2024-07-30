@@ -9,7 +9,22 @@
 <body>
     <form id="form1" runat="server">
         <div>
-            <asp:PlaceHolder ID="registerPagePlaceHolder" runat="server"></asp:PlaceHolder>
+            <div>
+            <asp:Label ID="registerLabel" runat="server" Text="Register?"></asp:Label>
+
+            </div>
+            <div>
+            <asp:PlaceHolder ID="registerPlaceHolder" runat="server"></asp:PlaceHolder>
+            </div>
+
+            <div>
+            <asp:Button ID="anonymousRegisterButton" runat="server" Text="Submit Anonymously" OnClick="anonymousRegisterButton_Click" />
+              <asp:Button ID="submitNowButton" runat="server" Text="Register And Submit"  />
+
+            </div>
+            <asp:Button ID="cancelButton" runat="server" Text="Cancel" OnClick="cancelButton_Click" />
+
+
         </div>
     </form>
 </body>

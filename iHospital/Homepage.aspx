@@ -13,7 +13,6 @@
                  <asp:Label ID="companyNameLabel" runat="server" Text="iHospital"></asp:Label>
                 <asp:Button ID="loginButton" runat="server" Text="Login" OnClick="loginButton_Click" />
             </div>
-            <asp:Button ID="registerButton" runat="server" Text="Start Survey" OnClick="registerButton_Click" />
             <asp:Button ID="startSurveyButton" runat="server" Text="Start Survey" OnClick="startSurveyButton_Click" />
 
         </div>

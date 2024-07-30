@@ -3,9 +3,7 @@ using iHospital.UserControl;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.EnterpriseServices;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -22,10 +20,6 @@ namespace iHospital
             DisplayCurrentQuestion();
         }
 
-        // list of questions
-        // FIrst list "question" will hold the list of questions that are not optional and "optionalQuestions" will hold optional questions
-        //List<Question> optionalQuestions = new List<Question>();
-        //List<DependentQuestion> dependentQuestions = new List<DependentQuestion>();
         private List<Answer> answers
         {
             get
@@ -106,8 +100,6 @@ namespace iHospital
             }
         }
 
-
-        // Current Questions 
         private int currentQuestionNumber
         {
             get
@@ -119,6 +111,7 @@ namespace iHospital
                 ViewState["CurrentQuestionNumber"] = value;
             }
         }
+
         private void LoadQuestions()
         {
             string connectionString = "Data Source=SQL5111.site4now.net;Initial Catalog=db_9ab8b7_224dda12275;User Id=db_9ab8b7_224dda12275_admin;Password=vWHVw5VW";
@@ -144,7 +137,7 @@ namespace iHospital
                                 QuestionOrder = Convert.ToInt32(reader["question_order"])
                             };
 
-                            if (tempQuestion.QuestionOrder != 0)
+                            if (tempQuestion.QuestionOrder != 0 && tempQuestion.QuestionOrder !=999)
                             {
                                 questions.Add(tempQuestion);
                                 questions.Sort((x, y) => x.QuestionOrder.CompareTo(y.QuestionOrder));
@@ -173,7 +166,6 @@ namespace iHospital
                         }
                     }
 
-
                     // Load dependent questions
                     string dependentQuery = "SELECT * FROM Contingent_Questions";
                     using (SqlCommand cmd = new SqlCommand(dependentQuery, conn))
@@ -197,14 +189,12 @@ namespace iHospital
                 // Log the error
                 System.Diagnostics.Debug.WriteLine("Error: " + ex.Message);
             }
-            
-            
-
         }
+
         private void DisplayCurrentQuestion()
         {
             PlaceHolder1.Controls.Clear();
-            if (currentQuestionNumber >=0 && currentQuestionNumber < questions.Count)
+            if (currentQuestionNumber >= 0 && currentQuestionNumber < questions.Count)
             {
                 Question currentQuestion = questions[currentQuestionNumber];
                 var items = options
@@ -217,184 +207,207 @@ namespace iHospital
                 switch (currentQuestion.QuestionType)
                 {
                     case "choose_one":
-                        ChooseUserControl chooseList = (ChooseUserControl)LoadControl("~/UserControl/ChooseUserControl.ascx");
-                        chooseList.QuestionText = currentQuestion.QuestionText;
-                        chooseList.SetChooseBoxListItems(items);
-                        //questionContainer.Controls.Add(chooseList);
-                        questionControl = chooseList;
-
+                        Label chooseQuestionLabel = new Label { Text = currentQuestion.QuestionText };
+                        RadioButtonList radioButtonList = new RadioButtonList
+                        {
+                            ID = "radioList",
+                            DataSource = items,
+                            DataTextField = "Key",
+                            DataValueField = "Value",
+                            SelectedIndex = 0
+                        };
+                        radioButtonList.DataBind();
+                        PlaceHolder1.Controls.Add(chooseQuestionLabel);
+                        PlaceHolder1.Controls.Add(radioButtonList);
                         break;
 
                     case "drop_down":
-                        DropDownUserControl dropDown = (DropDownUserControl)LoadControl("~/UserControl/DropDownUserControl.ascx");
-                        dropDown.QuestionText = currentQuestion.QuestionText;
-                        dropDown.SetDropDownListItems(items);
-                        //questionContainer.Controls.Add(dropDown);
-                        questionControl = dropDown;
+                        Label dropDownQuestionLabel = new Label { Text = currentQuestion.QuestionText };
+                        DropDownList dropDownList = new DropDownList
+                        {
+                            ID = "dropDownList",
+                            DataSource = items,
+                            DataTextField = "Key",
+                            DataValueField = "Value"
+                        };
+                        dropDownList.DataBind();
+                        PlaceHolder1.Controls.Add(dropDownQuestionLabel);
+                        PlaceHolder1.Controls.Add(dropDownList);
                         break;
 
                     case "select":
-                        CheckListControl checkList = (CheckListControl)LoadControl("~/UserControl/CheckListUserControl.ascx");
-                        checkList.QuestionText = currentQuestion.QuestionText;
-                        checkList.SetCheckBoxListItems(items);
-                        //questionContainer.Controls.Add(checkList);
-                        questionControl = checkList;
+                        Label checkBoxQuestionLabel = new Label { Text = currentQuestion.QuestionText };
+                        CheckBoxList checkBoxList = new CheckBoxList
+                        {
+                            ID = "optionsCheckBoxList",
+                            DataSource = items,
+                            DataTextField = "Key",
+                            DataValueField = "Value"
+                        };
+                        checkBoxList.DataBind();
+                        PlaceHolder1.Controls.Add(checkBoxQuestionLabel);
+                        PlaceHolder1.Controls.Add(checkBoxList);
                         break;
 
                     case "input":
-                        InputUserControl inputControl = (InputUserControl)LoadControl("~/UserControl/InputUserControl.ascx");
-                        inputControl.QuestionText = currentQuestion.QuestionText;
-                        //questionContainer.Controls.Add(inputControl);
-                        questionControl = inputControl;
+                        Label inputQuestionLabel = new Label { Text = currentQuestion.QuestionText };
+                        TextBox inputTextBox = new TextBox { ID = "inputTextBox" };
+                        PlaceHolder1.Controls.Add(inputQuestionLabel);
+                        PlaceHolder1.Controls.Add(inputTextBox);
+                        break;
+
+
+                    case "date":
+                        Label dateQuestionLabel = new Label { Text = currentQuestion.QuestionText };
+                        TextBox dateTextBox = new TextBox { ID = "dateTextBox" };
+                        PlaceHolder1.Controls.Add(dateQuestionLabel);
+                        PlaceHolder1.Controls.Add(dateTextBox);
+                        // Optionally add date picker initialization script
                         break;
                 }
+
                 if (questionControl != null)
                 {
                     PlaceHolder1.Controls.Add(questionControl);
                 }
-
             }
         }
 
+
         protected void previousButton_Click(object sender, EventArgs e)
         {
-            if(currentQuestionNumber > 0)
+            if (currentQuestionNumber > 0)
             {
+
+                foreach (DependentQuestion dependentQuestion in dependentQuestions)
+                {
+                    if(currentQuestionNumber == dependentQuestion.QuestionId)
+                    {
+                        questions.RemoveAt(currentQuestionNumber );
+                    }
+
+
+                }
+            
                 currentQuestionNumber--;
                 DisplayCurrentQuestion();
+               
 
+                  
+              
             }
         }
 
         protected void nextButton_Click(object sender, EventArgs e)
         {
 
-            Answer answer = new Answer();
-
-            if (PlaceHolder1.Controls.Count > 0)
+            if (currentQuestionNumber == questions.Count -1)
             {
-                var control = PlaceHolder1.Controls[0];
-                if (control is ChooseUserControl)
-                {
-                    var chooseControl = (ChooseUserControl)control;
-                    var selectedOption = chooseControl.GetChooseBoxListItems();
-                    if (selectedOption != null)
-                    {
-                        answer.OptionId = selectedOption.Value.Value;
-                        answer.QuestionId = questions[currentQuestionNumber].Id;
-                        answers.Add(answer);
-                    }
-                }
-                else if (control is DropDownUserControl)
-                {
-                    var dropDownControl = (DropDownUserControl)control;
-                    var selectedOption = dropDownControl.GetDropDownListSelectedItem();
-                    if (selectedOption != null)
-                    {
-                        answer.OptionId = selectedOption.Value.Value;
-                        answer.QuestionId = questions[currentQuestionNumber].Id;
-                        answers.Add(answer);
-                    }
-                }
-                else if (control is CheckListControl)
-                {
-                    var checkListControl = (CheckListControl)control;
-                    var selectedOptions = checkListControl.GetCheckBoxListItems();
-                    if (selectedOptions.Count > 0)
-                    {
-                        foreach (var item in selectedOptions)
-                        {
-                            answer.OptionId = item.Value;
-                            answer.QuestionId = questions[currentQuestionNumber].Id;
-                            answers.Add(answer);
-                        }
-                    }
-                }
-                else if (control is InputUserControl)
-                {
-                    var inputControl = (InputUserControl)control;
-                    answer.OptionId = 0;
-                    answer.QuestionId = questions[currentQuestionNumber].Id;
-                    answer.AnswerText = inputControl.TextFieldText;
-                    answers.Add(answer);
-                }
+                Session["Answers"] = answers;
+                Response.Redirect("~/Register.aspx");
+            }
+
+            foreach (Control control in PlaceHolder1.Controls)
+            {
+                ProcessCurrentAnswer(control);
             }
 
             if (dependentQuestions.Count > 0)
             {
-                foreach (var item in dependentQuestions)
-                {
-                    if (item.OptionID == answer.OptionId)
-                    {
-                        questions.Insert(currentQuestionNumber + 1, optionalQuestions.Find(ques => ques.Id == item.QuestionId));
-                        DisplayCurrentQuestion();
-                    }
-                }
+                HandleDependentQuestions();
             }
+
             if (currentQuestionNumber < questions.Count - 1)
             {
                 currentQuestionNumber++;
                 DisplayCurrentQuestion();
-
-               
-               
+            }
+            else
+            {
+                
             }
 
-            
-                        for(int i = 0; i < answers.Count; i++)
-                        {
-                System.Diagnostics.Debug.WriteLine(answers[i].QuestionId);
-                System.Diagnostics.Debug.WriteLine(answers[i].OptionId);
-                System.Diagnostics.Debug.WriteLine(answers[i].AnswerText);
-
-                        }
+            foreach (var answer in answers)
+            {
+                System.Diagnostics.Debug.WriteLine($"QuestionId: {answer.QuestionId}, OptionId: {answer.OptionId}, AnswerText: {answer.AnswerText}");
+            }
         }
 
-        private void SaveAnswerToDatabase(Answer answer)
+
+        private void HandleDependentQuestions()
         {
-            string connectionString = "Data Source=SQL5111.site4now.net;Initial Catalog=db_9ab8b7_224dda12275;User Id=db_9ab8b7_224dda12275_admin;Password=vWHVw5VW";
+            System.Diagnostics.Debug.WriteLine($"question count :" + questions.Count);
 
-            try
+            foreach (var depQuestion in dependentQuestions)
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                foreach (var answer in answers)
                 {
-                    conn.Open();
-                    string query = "INSERT INTO Answer ( question_id, option_id, answer, respondant_id) VALUES (@question_id, @optionId, @answer, @RespondantId)";
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    if (depQuestion.OptionID == answer.OptionId)
                     {
-                        cmd.Parameters.AddWithValue("@question_id", answer.QuestionId);
-                        cmd.Parameters.AddWithValue("@optionId", (object)answer.OptionId ?? DBNull.Value);
-                        cmd.Parameters.AddWithValue("@answer", (object)answer.AnswerText ?? DBNull.Value);
-                        cmd.Parameters.AddWithValue("@RespondantId", 1);
-                        cmd.ExecuteNonQuery();
-
-
+                        var optionalQuestion = optionalQuestions.Find(ques => ques.Id == depQuestion.QuestionId);
+                        if (optionalQuestion != null)
+                        {
+                            questions.Insert(currentQuestionNumber + 1, optionalQuestion);
+                        }
                     }
                 }
             }
-            catch (Exception ex)
+            System.Diagnostics.Debug.WriteLine($"question count :" + questions.Count);
+
+        }
+        private void ProcessCurrentAnswer(Control control)
+        {
+            if (control is RadioButtonList radioButtonList)
             {
-                // Log the error
-                System.Diagnostics.Debug.WriteLine("Error: " + ex.Message);
+                if (radioButtonList.SelectedItem != null)
+                {
+                    answers.Add(new Answer
+                    {
+                        OptionId = Convert.ToInt32(radioButtonList.SelectedValue),
+                        QuestionId = questions[currentQuestionNumber].Id
+                    });
+                }
+            }
+            else if (control is DropDownList dropDownList)
+            {
+                if (dropDownList.SelectedItem != null)
+                {
+                    answers.Add(new Answer
+                    {
+                        OptionId = Convert.ToInt32(dropDownList.SelectedValue),
+                        QuestionId = questions[currentQuestionNumber].Id
+                    });
+                }
+            }
+            else if (control is CheckBoxList checkBoxList)
+            {
+                foreach (ListItem item in checkBoxList.Items)
+                {
+                    if (item.Selected)
+                    {
+                        answers.Add(new Answer
+                        {
+                            OptionId = Convert.ToInt32(item.Value),
+                            QuestionId = questions[currentQuestionNumber].Id
+                        });
+                    }
+                }
+            }
+            else if (control is TextBox textBox)
+            {
+                if (!string.IsNullOrWhiteSpace(textBox.Text))
+                {
+                    answers.Add(new Answer
+                    {
+                        OptionId = 0,
+                        QuestionId = questions[currentQuestionNumber].Id,
+                        AnswerText = textBox.Text
+                    });
+                }
             }
         }
 
 
-        protected void StartSurveyButton_Click(object sender, EventArgs e)
-        {
-
-            ViewState["Answers"] = answers;
-
-            foreach (var item in answers)
-            {
-                SaveAnswerToDatabase(item);
-            }
-            Label label = new Label();
-            label.Text = "Successfully Submitted";
-              
-                PlaceHolder1.Controls.Add(label);
-            }
-        
-
+       
     }
 }

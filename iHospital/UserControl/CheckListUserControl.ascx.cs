@@ -29,7 +29,7 @@ namespace iHospital
             optionsCheckBoxList.DataBind();
         }
 
-
+      
 
         public List<KeyValuePair<string, int>> GetCheckBoxListItems()
         {
@@ -49,3 +49,4 @@ namespace iHospital
         }
     }
 }
+

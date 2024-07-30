@@ -13,15 +13,21 @@
 <body>
     <form id="form1" runat="server">
         <div>
+
+            <div>
+
+          
+             <asp:Label ID="welcomeScreenLabel" runat="server" Text="Label">
+    Welcome to Survey Site
+ </asp:Label>
+
+                  </div>
             <asp:PlaceHolder ID="PlaceHolder1" runat="server"></asp:PlaceHolder>
-            <asp:Label ID="welcomeScreenLabel" runat="server" Text="Label">
-               Welcome to Survey Site
-            </asp:Label>
-            <div id ="questionContainer" runat ="server">
-            </div>
+           
+          
             <asp:Button ID="previousButton" runat="server" Text="Previous" OnClick="previousButton_Click" CausesValidation="false" UseSubmitBehavior="false"/>
             <asp:Button ID="nextButton" runat="server" Text="Next" OnClick="nextButton_Click" CausesValidation="false" UseSubmitBehavior="False" />
-            <asp:Button ID="StartSurveyButton" runat="server" Text="Submit" OnClick="StartSurveyButton_Click" CausesValidation="false" UseSubmitBehavior="False" />
+            
         </div>
     </form>
 </body>
