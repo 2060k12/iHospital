@@ -11,6 +11,8 @@ namespace iHospital
 {
     public partial class WebForm1 : System.Web.UI.Page
     {
+
+        static bool shouldUpdateQuestionNumber = true;
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
@@ -193,10 +195,33 @@ namespace iHospital
 
         private void DisplayCurrentQuestion()
         {
+
+
+
             surveyPlaceHolder.Controls.Clear();
             if (currentQuestionNumber >= 0 && currentQuestionNumber < questions.Count)
             {
                 Question currentQuestion = questions[currentQuestionNumber];
+
+                for (int i = 0; i < dependentQuestions.Count; i++)
+                {
+                    // Ensure there's a last answer to compare
+                    if (answers.Any() && answers.Last().OptionId == dependentQuestions[i].OptionID)
+                    {
+                        // Update the currentQuestion if the dependent question is found
+                        currentQuestion = optionalQuestions.Find(ques => ques.Id == dependentQuestions[i].QuestionId);
+                        shouldUpdateQuestionNumber = false;
+                        break; // Exit loop once a matching dependent question is found
+                    }
+                    else
+                    {
+                        shouldUpdateQuestionNumber = true;
+                    }
+               
+                }
+
+
+
                 var items = options
                     .Where(o => o.QuestionId == currentQuestion.Id)
                     .Select(o => new KeyValuePair<string, int>(o.Option_Value, o.Id))
@@ -312,14 +337,13 @@ namespace iHospital
                 ProcessCurrentAnswer(control);
             }
 
-            if (dependentQuestions.Count > 0)
-            {
-                HandleDependentQuestions();
-            }
 
             if (currentQuestionNumber < questions.Count - 1)
             {
-                currentQuestionNumber++;
+                if (shouldUpdateQuestionNumber)
+                {
+                    currentQuestionNumber++;
+                }
                 DisplayCurrentQuestion();
             }
             else
