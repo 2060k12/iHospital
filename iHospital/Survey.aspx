@@ -22,7 +22,7 @@
  </asp:Label>
 
                   </div>
-            <asp:PlaceHolder ID="PlaceHolder1" runat="server"></asp:PlaceHolder>
+            <asp:PlaceHolder ID="surveyPlaceHolder" runat="server"></asp:PlaceHolder>
            
           
             <asp:Button ID="previousButton" runat="server" Text="Previous" OnClick="previousButton_Click" CausesValidation="false" UseSubmitBehavior="false"/>

@@ -193,7 +193,7 @@ namespace iHospital
 
         private void DisplayCurrentQuestion()
         {
-            PlaceHolder1.Controls.Clear();
+            surveyPlaceHolder.Controls.Clear();
             if (currentQuestionNumber >= 0 && currentQuestionNumber < questions.Count)
             {
                 Question currentQuestion = questions[currentQuestionNumber];
@@ -217,8 +217,8 @@ namespace iHospital
                             SelectedIndex = 0
                         };
                         radioButtonList.DataBind();
-                        PlaceHolder1.Controls.Add(chooseQuestionLabel);
-                        PlaceHolder1.Controls.Add(radioButtonList);
+                        surveyPlaceHolder.Controls.Add(chooseQuestionLabel);
+                        surveyPlaceHolder.Controls.Add(radioButtonList);
                         break;
 
                     case "drop_down":
@@ -231,8 +231,8 @@ namespace iHospital
                             DataValueField = "Value"
                         };
                         dropDownList.DataBind();
-                        PlaceHolder1.Controls.Add(dropDownQuestionLabel);
-                        PlaceHolder1.Controls.Add(dropDownList);
+                        surveyPlaceHolder.Controls.Add(dropDownQuestionLabel);
+                        surveyPlaceHolder.Controls.Add(dropDownList);
                         break;
 
                     case "select":
@@ -245,30 +245,30 @@ namespace iHospital
                             DataValueField = "Value"
                         };
                         checkBoxList.DataBind();
-                        PlaceHolder1.Controls.Add(checkBoxQuestionLabel);
-                        PlaceHolder1.Controls.Add(checkBoxList);
+                        surveyPlaceHolder.Controls.Add(checkBoxQuestionLabel);
+                        surveyPlaceHolder.Controls.Add(checkBoxList);
                         break;
 
                     case "input":
                         Label inputQuestionLabel = new Label { Text = currentQuestion.QuestionText };
                         TextBox inputTextBox = new TextBox { ID = "inputTextBox" };
-                        PlaceHolder1.Controls.Add(inputQuestionLabel);
-                        PlaceHolder1.Controls.Add(inputTextBox);
+                        surveyPlaceHolder.Controls.Add(inputQuestionLabel);
+                        surveyPlaceHolder.Controls.Add(inputTextBox);
                         break;
 
 
                     case "date":
                         Label dateQuestionLabel = new Label { Text = currentQuestion.QuestionText };
                         TextBox dateTextBox = new TextBox { ID = "dateTextBox" };
-                        PlaceHolder1.Controls.Add(dateQuestionLabel);
-                        PlaceHolder1.Controls.Add(dateTextBox);
+                        surveyPlaceHolder.Controls.Add(dateQuestionLabel);
+                        surveyPlaceHolder.Controls.Add(dateTextBox);
                         // Optionally add date picker initialization script
                         break;
                 }
 
                 if (questionControl != null)
                 {
-                    PlaceHolder1.Controls.Add(questionControl);
+                    surveyPlaceHolder.Controls.Add(questionControl);
                 }
             }
         }
@@ -307,7 +307,7 @@ namespace iHospital
                 Response.Redirect("~/Register.aspx");
             }
 
-            foreach (Control control in PlaceHolder1.Controls)
+            foreach (Control control in surveyPlaceHolder.Controls)
             {
                 ProcessCurrentAnswer(control);
             }
@@ -338,6 +338,8 @@ namespace iHospital
         {
             System.Diagnostics.Debug.WriteLine($"question count :" + questions.Count);
 
+            List<Question> tempQuestion = questions;
+
             foreach (var depQuestion in dependentQuestions)
             {
                 foreach (var answer in answers)
@@ -345,10 +347,13 @@ namespace iHospital
                     if (depQuestion.OptionID == answer.OptionId)
                     {
                         var optionalQuestion = optionalQuestions.Find(ques => ques.Id == depQuestion.QuestionId);
-                        if (optionalQuestion != null)
+                          if (optionalQuestion != null)
                         {
-                            questions.Insert(currentQuestionNumber + 1, optionalQuestion);
+                            tempQuestion.Insert(currentQuestionNumber + 1, optionalQuestion);
                         }
+
+                        questions = tempQuestion;
+                        DisplayCurrentQuestion();
                     }
                 }
             }
