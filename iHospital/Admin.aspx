@@ -13,9 +13,11 @@
                
             </asp:DropDownList>
             <asp:DropDownList ID="ddlOptions" runat="server" AutoPostBack="True" OnSelectedIndexChanged="ddlOptions_SelectedIndexChanged">
-</asp:DropDownList>
+            </asp:DropDownList>
                
             </asp:DropDownList>
+                        <asp:TextBox ID="txtSearch" runat="server" AutoPostBack="True" OnTextChanged="txtSearch_TextChanged"></asp:TextBox>
+
             <asp:GridView ID="respondantGridView" runat="server" AutoGenerateColumns="true"></asp:GridView>
         </div>
     </form>

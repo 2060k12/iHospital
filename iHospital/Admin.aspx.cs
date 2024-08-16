@@ -222,6 +222,15 @@ namespace iHospital
             // Re-bind the GridView with the filtered data
             BindQuestionsToGridView();
         }
+        protected void txtSearch_TextChanged(object sender, EventArgs e)
+        {
+            // Re-bind the GridView with the filtered data
+            BindQuestionsToGridView();
+        }
+
+
+
+      
 
 
 
@@ -256,9 +265,15 @@ namespace iHospital
                 filteredAnswers = filteredAnswers.Where(a => a.OptionId == selectedOptionId).ToList();
             }
 
+            if (!string.IsNullOrEmpty(txtSearch.Text))
+            {
+                filteredAnswers = filteredAnswers.Where(a => a.AnswerText != null && a.AnswerText.Contains(txtSearch.Text)).ToList();
+            }
+
             // Return the list of respondent IDs that match the selected criteria
             return filteredAnswers.Select(a => a.RespondantId).Distinct().ToList();
         }
+
 
 
 
@@ -316,6 +331,7 @@ namespace iHospital
             respondantGridView.DataSource = dt;
             respondantGridView.DataBind();
         }
+
 
 
 
