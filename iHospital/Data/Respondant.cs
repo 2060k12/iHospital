@@ -7,10 +7,8 @@ namespace iHospital.Data
 {
     public class Respondant
     {
-        int Id { get; set; }
-        int RegisteredDateTime { get; set; }
-        string RespondantFirstName { get; set; }
-        string macAddress { get; set; }
+        public int Id { get; set; }
+        public string FirstName { get; set; }
 
     }
 }

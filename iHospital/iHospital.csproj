@@ -91,6 +91,7 @@
     <Compile Include="Data\DependentQuestion.cs" />
     <Compile Include="Data\Option.cs" />
     <Compile Include="Data\Respondant.cs" />
+    <Compile Include="Data\Session.cs" />
     <Compile Include="Homepage.aspx.cs">
       <DependentUpon>Homepage.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

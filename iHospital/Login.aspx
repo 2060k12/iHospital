@@ -10,15 +10,15 @@
     <form id="form1" runat="server">
         <div>
 
-
-
-            <asp:Label ID="userNameLbl" runat="server" Text="Username"></asp:Label>
-            <asp:TextBox ID="userNameTextBox" runat="server"></asp:TextBox>
-
-            <asp:Label ID="passwordLbl" runat="server" Text="Password"></asp:Label>
-            <asp:TextBox ID="passwordTextBox" runat="server"></asp:TextBox>
-
-            <asp:Button ID="loginButton" runat="server" Text="Login" OnClick="loginButton_Click" />
+<asp:Label ID="lblUsername" runat="server" Text="Username:"></asp:Label>
+<asp:TextBox ID="txtUsername" runat="server"></asp:TextBox>
+<br />
+<asp:Label ID="lblPassword" runat="server" Text="Password:"></asp:Label>
+<asp:TextBox ID="txtPassword" runat="server" TextMode="Password"></asp:TextBox>
+<br />
+<asp:Button ID="loginButton" runat="server" Text="Login" OnClick="loginButton_Click" />
+<br />
+<asp:Label ID="lblMessage" runat="server" ForeColor="Red"></asp:Label>
             
         </div>
     </form>

@@ -9,6 +9,7 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using static System.Collections.Specialized.BitVector32;
 
 namespace iHospital
 {
@@ -16,6 +17,8 @@ namespace iHospital
     {
         string myConnectionString;
 
+        private List<Respondant> respondants;
+        private List<Session> sessions;
         private List<Question> questions
         {
             get
@@ -64,6 +67,55 @@ namespace iHospital
             }
         }
 
+
+
+
+
+
+        private void LoadSessions()
+        {
+            string connectionString = myConnectionString;
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    // Load sessions
+                    string sessionQuery = "SELECT * FROM Session";
+                    using (SqlCommand cmd = new SqlCommand(sessionQuery, conn))
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        sessions = new List<Session>();
+                        while (reader.Read())
+                        {
+                            Session tempSession = new Session
+                            {
+                                Id = Convert.ToInt32(reader["id"]),
+                                DateTime = Convert.ToDateTime(reader["date_time"]),
+                                MacAddress = reader["mac_address"].ToString()
+                            };
+                            sessions.Add(tempSession);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the error
+                System.Diagnostics.Debug.WriteLine("Error: " + ex.Message);
+            }
+
+            // Ensure the list is not null
+            if (sessions == null)
+            {
+                sessions = new List<Session>();
+            }
+        }
+
+
+
         protected void Page_Load(object sender, EventArgs e)
         {
             myConnectionString = ConfigurationManager.ConnectionStrings["CurrentConnection"].ConnectionString;
@@ -77,10 +129,13 @@ namespace iHospital
                 LoadQuestions();
                 LoadOptions();
                 LoadAnswers();
+                LoadSessions();
                 PopulateQuestionsDropDown();
                 BindQuestionsToGridView();
             }
         }
+
+
 
         private void LoadQuestions()
         {
@@ -282,6 +337,13 @@ namespace iHospital
         {
             DataTable dt = new DataTable();
 
+            // Add Respondant ID as the first column
+            dt.Columns.Add("Respondant ID");
+
+            // Add columns for Session data
+            dt.Columns.Add("Session DateTime");
+            dt.Columns.Add("Session MacAddress");
+
             // Add columns to DataTable based on questions
             foreach (Question question in questions)
             {
@@ -295,6 +357,20 @@ namespace iHospital
             foreach (var respondentId in filteredRespondentIds)
             {
                 DataRow row = dt.NewRow();
+
+                // Add Respondant ID
+                row["Respondant ID"] = respondentId;
+
+                // Add Session data
+                if (sessions != null)
+                {
+                    var session = sessions.FirstOrDefault(s => s.Id == respondentId); // Assuming session ID matches respondent ID
+                    if (session != null)
+                    {
+                        row["Session DateTime"] = session.DateTime;
+                        row["Session MacAddress"] = session.MacAddress;
+                    }
+                }
 
                 // Fill in the answers for this respondent
                 foreach (Question question in questions)
@@ -331,6 +407,8 @@ namespace iHospital
             respondantGridView.DataSource = dt;
             respondantGridView.DataBind();
         }
+
+
 
 
 

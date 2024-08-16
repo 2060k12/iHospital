@@ -16,7 +16,7 @@
             </asp:DropDownList>
                
             </asp:DropDownList>
-                        <asp:TextBox ID="txtSearch" runat="server" AutoPostBack="True" OnTextChanged="txtSearch_TextChanged"></asp:TextBox>
+            <asp:TextBox ID="txtSearch" runat="server" AutoPostBack="True" OnTextChanged="txtSearch_TextChanged" placeHolder ="Type and press Enter to search"></asp:TextBox>
 
             <asp:GridView ID="respondantGridView" runat="server" AutoGenerateColumns="true"></asp:GridView>
         </div>
