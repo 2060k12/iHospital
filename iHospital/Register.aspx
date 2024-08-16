@@ -18,7 +18,7 @@
             </div>
 
             <div>
-            <asp:Button ID="anonymousRegisterButton" runat="server" Text="Submit Anonymously" OnClick="anonymousRegisterButton_Click" />
+            <asp:Button ID="anonymousRegisterButton" runat="server" Text="Submit Anonymously (Working)" OnClick="anonymousRegisterButton_Click" />
               <asp:Button ID="submitNowButton" runat="server" Text="Register And Submit"  />
 
             </div>

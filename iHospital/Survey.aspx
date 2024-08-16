@@ -17,9 +17,16 @@
             <div>
 
           
-             <asp:Label ID="welcomeScreenLabel" runat="server" Text="Label">
-    Welcome to Survey Site
- </asp:Label>
+                <div>
+            <asp:Label ID="welcomeScreenLabel" runat="server" Text="Label">
+   Welcome to Survey Site
+</asp:Label>
+                </div>
+           
+
+                <div>
+                    <asp:Label ID="infoLabel" runat="server" Text="Feel free to skip any question You are unconfortable with"></asp:Label>
+                </div>
 
                   </div>
             <asp:PlaceHolder ID="surveyPlaceHolder" runat="server"></asp:PlaceHolder>

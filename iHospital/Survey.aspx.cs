@@ -1,8 +1,11 @@
-﻿using iHospital.Data;
+﻿using iHospital.config;
+using iHospital.Data;
 using iHospital.UserControl;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data.SqlClient;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -11,10 +14,21 @@ namespace iHospital
 {
     public partial class WebForm1 : System.Web.UI.Page
     {
+        string myConnectionString;
+        static bool backFromDependentQuestion = false;
 
         static bool shouldUpdateQuestionNumber = true;
+        static int currentDependentQuestionNumber = 0;
         protected void Page_Load(object sender, EventArgs e)
         {
+
+            myConnectionString = ConfigurationManager.ConnectionStrings["CurrentConnection"].ConnectionString;
+
+            if (myConnectionString.Equals("dev")){
+                myConnectionString = AppConst.DBServerConnection.testConnectionString;
+            }
+
+
             if (!IsPostBack)
             {
                 LoadQuestions();
@@ -116,7 +130,7 @@ namespace iHospital
 
         private void LoadQuestions()
         {
-            string connectionString = "Data Source=SQL5111.site4now.net;Initial Catalog=db_9ab8b7_224dda12275;User Id=db_9ab8b7_224dda12275_admin;Password=vWHVw5VW";
+            string connectionString = myConnectionString;
 
             try
             {
@@ -197,6 +211,14 @@ namespace iHospital
         {
 
 
+            if (currentQuestionNumber == 0)
+            {
+                previousButton.Visible = false;
+
+            }
+            else             {
+                previousButton.Visible = true;
+            }
 
             surveyPlaceHolder.Controls.Clear();
             if (currentQuestionNumber >= 0 && currentQuestionNumber < questions.Count)
@@ -206,16 +228,18 @@ namespace iHospital
                 for (int i = 0; i < dependentQuestions.Count; i++)
                 {
                     // Ensure there's a last answer to compare
-                    if (answers.Any() && answers.Last().OptionId == dependentQuestions[i].OptionID)
+                    if ( answers.Any() && answers.Last().OptionId == dependentQuestions[i].OptionID)
                     {
                         // Update the currentQuestion if the dependent question is found
                         currentQuestion = optionalQuestions.Find(ques => ques.Id == dependentQuestions[i].QuestionId);
+                        currentDependentQuestionNumber = dependentQuestions[i].QuestionId;
                         shouldUpdateQuestionNumber = false;
                         break; // Exit loop once a matching dependent question is found
                     }
                     else
                     {
                         shouldUpdateQuestionNumber = true;
+                        currentDependentQuestionNumber = 0;
                     }
                
                 }
@@ -275,6 +299,7 @@ namespace iHospital
                         break;
 
                     case "input":
+                    case "email":
                         Label inputQuestionLabel = new Label { Text = currentQuestion.QuestionText };
                         TextBox inputTextBox = new TextBox { ID = "inputTextBox" };
                         surveyPlaceHolder.Controls.Add(inputQuestionLabel);
@@ -287,7 +312,7 @@ namespace iHospital
                         TextBox dateTextBox = new TextBox { ID = "dateTextBox" };
                         surveyPlaceHolder.Controls.Add(dateQuestionLabel);
                         surveyPlaceHolder.Controls.Add(dateTextBox);
-                        // Optionally add date picker initialization script
+                        
                         break;
                 }
 
@@ -306,15 +331,20 @@ namespace iHospital
 
                 foreach (DependentQuestion dependentQuestion in dependentQuestions)
                 {
-                    if(currentQuestionNumber == dependentQuestion.QuestionId)
+                    if (currentQuestionNumber == dependentQuestion.QuestionId)
                     {
-                        questions.RemoveAt(currentQuestionNumber );
+
+                        backFromDependentQuestion = true;
+                        break;
+
                     }
 
-
                 }
-            
-                currentQuestionNumber--;
+
+                
+                    currentQuestionNumber--;
+                
+          
                 DisplayCurrentQuestion();
                
 
@@ -390,22 +420,54 @@ namespace iHospital
             {
                 if (radioButtonList.SelectedItem != null)
                 {
-                    answers.Add(new Answer
+                    if (currentDependentQuestionNumber != 0)
                     {
-                        OptionId = Convert.ToInt32(radioButtonList.SelectedValue),
-                        QuestionId = questions[currentQuestionNumber].Id
-                    });
+
+                        answers.Add(new Answer
+                        {
+                            OptionId = Convert.ToInt32(radioButtonList.SelectedValue),
+
+                            QuestionId = currentDependentQuestionNumber
+                        });
+                    }
+                    else
+                    {
+
+
+                        answers.Add(new Answer
+                        {
+                            OptionId = Convert.ToInt32(radioButtonList.SelectedValue),
+
+
+
+                            QuestionId = questions[currentQuestionNumber].Id
+                        });
+                    }
                 }
+
             }
             else if (control is DropDownList dropDownList)
             {
                 if (dropDownList.SelectedItem != null)
                 {
-                    answers.Add(new Answer
+
+                    if (currentDependentQuestionNumber != 0)
                     {
-                        OptionId = Convert.ToInt32(dropDownList.SelectedValue),
-                        QuestionId = questions[currentQuestionNumber].Id
-                    });
+                        answers.Add(new Answer
+                        {
+                            OptionId = Convert.ToInt32(dropDownList.SelectedValue),
+                            QuestionId = currentDependentQuestionNumber
+                        });
+
+                    }
+                    else
+                    {
+                        answers.Add(new Answer
+                        {
+                            OptionId = Convert.ToInt32(dropDownList.SelectedValue),
+                            QuestionId = questions[currentQuestionNumber].Id
+                        });
+                    }
                 }
             }
             else if (control is CheckBoxList checkBoxList)
@@ -414,11 +476,23 @@ namespace iHospital
                 {
                     if (item.Selected)
                     {
-                        answers.Add(new Answer
+
+                        if (currentDependentQuestionNumber != 0)
                         {
-                            OptionId = Convert.ToInt32(item.Value),
-                            QuestionId = questions[currentQuestionNumber].Id
-                        });
+                            answers.Add(new Answer
+                            {
+                                OptionId = Convert.ToInt32(item.Value),
+                                QuestionId = currentDependentQuestionNumber
+                            });
+                        }
+                        else
+                        {
+                            answers.Add(new Answer
+                            {
+                                OptionId = Convert.ToInt32(item.Value),
+                                QuestionId = questions[currentQuestionNumber].Id
+                            });
+                        }
                     }
                 }
             }
@@ -426,12 +500,23 @@ namespace iHospital
             {
                 if (!string.IsNullOrWhiteSpace(textBox.Text))
                 {
-                    answers.Add(new Answer
+                    if (currentDependentQuestionNumber != 0)
                     {
-                        OptionId = 0,
-                        QuestionId = questions[currentQuestionNumber].Id,
-                        AnswerText = textBox.Text
-                    });
+                        answers.Add(new Answer
+                        {
+                            OptionId = 0,
+                            QuestionId = currentDependentQuestionNumber,
+                            AnswerText = textBox.Text
+                        });
+                    }
+                    else
+                        answers.Add(new Answer
+                        {
+                            OptionId = 0,
+                            QuestionId = questions[currentQuestionNumber].Id,
+                            AnswerText = textBox.Text
+                        });
+                }
                 }
             }
         }
@@ -439,4 +524,3 @@ namespace iHospital
 
        
     }
-}

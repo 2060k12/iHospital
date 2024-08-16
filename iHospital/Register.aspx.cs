@@ -1,6 +1,8 @@
-﻿using iHospital.Data;
+﻿using iHospital.config;
+using iHospital.Data;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net.Mail;
@@ -13,7 +15,7 @@ namespace iHospital
 {
     public partial class Register : System.Web.UI.Page
     {
-        string connectionString = "Data Source=SQL5111.site4now.net;Initial Catalog=db_9ab8b7_224dda12275;User Id=db_9ab8b7_224dda12275_admin;Password=vWHVw5VW";
+        string myConnectionString;
 
 
 
@@ -37,6 +39,13 @@ namespace iHospital
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            myConnectionString = ConfigurationManager.ConnectionStrings["CurrentConnection"].ConnectionString;
+
+            if (myConnectionString.Equals("dev"))
+            {
+                myConnectionString = AppConst.DBServerConnection.testConnectionString;
+            }
+
             if (!IsPostBack)
             {
                 LoadQuestions();
@@ -74,7 +83,7 @@ namespace iHospital
 
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                using (SqlConnection conn = new SqlConnection(myConnectionString))
                 {
                     conn.Open();
 
@@ -167,7 +176,7 @@ namespace iHospital
            
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                using (SqlConnection conn = new SqlConnection(myConnectionString))
                 {
                     conn.Open();
 
