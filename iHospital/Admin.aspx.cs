@@ -17,8 +17,37 @@ namespace iHospital
     {
         string myConnectionString;
 
-        private List<Respondant> respondants;
-        private List<Session> sessions;
+        private List<Respondant> respondants
+        {
+            get
+            {
+                if (ViewState["Respondants"] == null)
+                {
+                    ViewState["Respondants"] = new List<Respondant>();
+                }
+                return (List<Respondant>)ViewState["Respondants"];
+            }
+            set
+            {
+                ViewState["Respondants"] = value;
+            }
+        }
+        private List<Session> sessions
+        {
+
+            get
+            {
+                if (ViewState["Sessions"] == null)
+                {
+                    ViewState["Sessions"] = new List<Session>();
+                }
+                return (List<Session>)ViewState["Sessions"];
+            }
+            set
+            {
+                ViewState["Sessions"] = value;
+            }
+        }
         private List<Question> questions
         {
             get
@@ -34,6 +63,8 @@ namespace iHospital
                 ViewState["OptionalQuestions"] = value;
             }
         }
+
+
 
         private List<Option> options
         {
@@ -260,6 +291,8 @@ namespace iHospital
             int selectedQuestionId;
             if (int.TryParse(ddlQuestions.SelectedValue, out selectedQuestionId))
             {
+               
+             
                 PopulateOptionsDropDown(selectedQuestionId);
             }
             else
@@ -364,12 +397,22 @@ namespace iHospital
                 // Add Session data
                 if (sessions != null)
                 {
-                    var session = sessions.FirstOrDefault(s => s.Id == respondentId); // Assuming session ID matches respondent ID
+                    var session = sessions.FirstOrDefault(s => s.Id == respondentId); 
                     if (session != null)
                     {
                         row["Session DateTime"] = session.DateTime;
                         row["Session MacAddress"] = session.MacAddress;
                     }
+                    else
+                    {
+                        row["Session DateTime"] = "N/A";
+                        row["Session MacAddress"] = "N/A";
+                    }
+                }
+                else
+                {
+                    row["Session DateTime"] = "N/A";
+                    row["Session MacAddress"] = "N/A";
                 }
 
                 // Fill in the answers for this respondent
@@ -396,7 +439,7 @@ namespace iHospital
                     }
                     else
                     {
-                        row[question.QuestionText] = "No Answer"; // Or handle as needed
+                        row[question.QuestionText] = "No Answer";
                     }
                 }
 
@@ -406,7 +449,27 @@ namespace iHospital
             // Bind DataTable to GridView
             respondantGridView.DataSource = dt;
             respondantGridView.DataBind();
+
+            // Ensure Respondant ID and Session columns are always visible
+            if (respondantGridView.Columns.Count > 0)
+            {
+                respondantGridView.Columns[0].Visible = true; // Respondant ID
+                respondantGridView.Columns[1].Visible = true; // Session DateTime
+                respondantGridView.Columns[2].Visible = true; // Session MacAddress
+            }
         }
+
+
+        protected void btnSignOut_Click(object sender, EventArgs e)
+        {// Clear the session
+            Session.Clear();
+            Session.Abandon();
+
+
+            // Redirect to the login page
+            Response.Redirect("~/Homepage.aspx");
+        }
+
 
 
 

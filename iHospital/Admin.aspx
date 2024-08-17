@@ -19,8 +19,10 @@
                 </asp:DropDownList>
             </div>
             <asp:TextBox ID="txtSearch" runat="server" AutoPostBack="True" OnTextChanged="txtSearch_TextChanged" placeholder="Type and press Enter to search" CssClass="input"></asp:TextBox>
-        </div>
-        <asp:GridView ID="respondantGridView" runat="server" AutoGenerateColumns="true"></asp:GridView>
+       <asp:Button ID="btnSignOut" runat="server" Text="Sign Out" OnClick="btnSignOut_Click" CssClass="btn-primary" />
+
+               </div>
+        <asp:GridView ID="respondantGridView" runat="server" AutoGenerateColumns="true"  ></asp:GridView>
     </form>
 </body>
 </html>

@@ -20,6 +20,11 @@ namespace iHospital
 
 
 
+        private void registerAsUser()
+        {
+
+        }
+
 
         private List<Question> questions
         {
@@ -80,7 +85,6 @@ namespace iHospital
 
         private void SaveAnswerToDatabase(Answer answer, int id)
         {
-
             try
             {
                 using (SqlConnection conn = new SqlConnection(myConnectionString))
@@ -124,6 +128,7 @@ namespace iHospital
                 System.Diagnostics.Debug.WriteLine("Error: " + ex.Message);
             }
         }
+
 
         private void LoadQuestions()
         {
@@ -169,6 +174,94 @@ namespace iHospital
             }
         }
 
+        protected void registerButton_Click(object sender, EventArgs e)
+        {
+            int registeredId = registerUser();
+            var answers = Session["Answers"] as List<Answer> ?? new List<Answer>();
+
+            // Add answers from questions
+            foreach (Question question in questions)
+            {
+                TextBox textBox = (TextBox)registerPlaceHolder.FindControl("textBox_" + question.Id);
+                if (textBox != null)
+                {
+                    string answerText = textBox.Text;
+                    if (!string.IsNullOrEmpty(answerText))
+                    {
+                        answers.Add(new Answer
+                        {
+                            QuestionId = question.Id,
+                            AnswerText = answerText,
+                            RespondantId = registeredId,
+                            OptionId = 0 //  OptionId is 0 for text answers
+                        });
+                    }
+                }
+            }
+
+            // Save all answers to the database
+            foreach (var item in answers)
+            {
+                SaveAnswerToDatabase(item, registeredId);
+            }
+
+            Label label = new Label
+            {
+                Text = "Successfully Submitted"
+            };
+            registerPlaceHolder.Controls.Add(label);
+        }
+
+
+        private int registerUser()
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(myConnectionString))
+                {
+                    conn.Open();
+
+                    // Retrieving maximum id from the table
+                    int newRespondantId = 0;
+                    string getMaxIdQuery = "SELECT ISNULL(MAX(id), 0) + 1 FROM Respondant";
+                    using (SqlCommand getMaxIdCmd = new SqlCommand(getMaxIdQuery, conn))
+                    {
+                        newRespondantId = (int)getMaxIdCmd.ExecuteScalar();
+                    }
+
+                    // Insert a user into Respondant table
+                    string insertRespondantQuery = "INSERT INTO Respondant (id, first_Name) VALUES (@id, @firstName)";
+                    using (SqlCommand insertRespondantCmd = new SqlCommand(insertRespondantQuery, conn))
+                    {
+                        insertRespondantCmd.Parameters.AddWithValue("@id", newRespondantId);
+                        insertRespondantCmd.Parameters.AddWithValue("@firstName", "User"); // Replace with actual user data
+                        insertRespondantCmd.ExecuteNonQuery();
+                    }
+
+                    var macAddress = (
+                        from nic in NetworkInterface.GetAllNetworkInterfaces()
+                        where nic.OperationalStatus == OperationalStatus.Up
+                        select nic.GetPhysicalAddress().ToString()
+                    ).FirstOrDefault();
+
+                    string insertSessionQuery = "INSERT INTO Session (id, mac_Address) VALUES (@id, @macAddress)";
+                    using (SqlCommand insertSessionCmd = new SqlCommand(insertSessionQuery, conn))
+                    {
+                        insertSessionCmd.Parameters.AddWithValue("@id", newRespondantId);
+                        insertSessionCmd.Parameters.AddWithValue("@macAddress", macAddress);
+                        insertSessionCmd.ExecuteNonQuery();
+                    }
+
+                    return newRespondantId;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                System.Diagnostics.Debug.WriteLine("Error: " + ex.Message);
+            }
+            return 0;
+        }
 
         private int registerifAnonymous()
         {

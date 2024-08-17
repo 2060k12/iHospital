@@ -1,11 +1,9 @@
 ﻿using iHospital.config;
 using iHospital.Data;
-using iHospital.UserControl;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
-using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -388,6 +386,8 @@ namespace iHospital
         }
 
 
+
+
         private void HandleDependentQuestions()
         {
             System.Diagnostics.Debug.WriteLine($"question count :" + questions.Count);
@@ -437,9 +437,7 @@ namespace iHospital
                         answers.Add(new Answer
                         {
                             OptionId = Convert.ToInt32(radioButtonList.SelectedValue),
-
-
-
+                          
                             QuestionId = questions[currentQuestionNumber].Id
                         });
                     }
