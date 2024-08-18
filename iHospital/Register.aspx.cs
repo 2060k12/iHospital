@@ -367,6 +367,12 @@ namespace iHospital
                 Text = "Successfully Submitted"
             };
             registerPlaceHolder.Controls.Add(label);
+
+
+            answers.Clear();
+            Session["Answers"] = answers;
+            Response.Redirect("~/Homepage.aspx");
+ 
         }
 
         protected void cancelButton_Click(object sender, EventArgs e)

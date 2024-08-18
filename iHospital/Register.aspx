@@ -18,14 +18,13 @@
                 <asp:PlaceHolder ID="registerPlaceHolder" runat="server"></asp:PlaceHolder>
             </div>
             <div>
-                <asp:Button ID="anonymousRegisterButton" runat="server" CssClass="btn btn-secondary" Text="Submit Anonymously (Working)" OnClick="anonymousRegisterButton_Click" />
+                <asp:Button ID="anonymousRegisterButton" runat="server" CssClass="btn btn-secondary" Text="Submit Anonymously" OnClick="anonymousRegisterButton_Click" />
                 <asp:Button ID="submitNowButton" runat="server" CssClass="btn btn-primary" Text="Register And Submit" OnClick="registerButton_Click" />
             </div>
             <div>
                 <asp:Button ID="cancelButton" runat="server" CssClass="btn btn-cancel" Text="Back to Home Screen" OnClick="cancelButton_Click" />
             </div>
         </div>
-    </form>
     </form>
 </body>
 </html>

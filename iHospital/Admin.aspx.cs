@@ -341,25 +341,71 @@ namespace iHospital
         {
             var filteredAnswers = answerList;
 
+            // Filter by Question
             if (!string.IsNullOrEmpty(ddlQuestions.SelectedValue))
             {
                 int selectedQuestionId = int.Parse(ddlQuestions.SelectedValue);
                 filteredAnswers = filteredAnswers.Where(a => a.QuestionId == selectedQuestionId).ToList();
             }
 
+            // Filter by Option
             if (!string.IsNullOrEmpty(ddlOptions.SelectedValue))
             {
                 int selectedOptionId = int.Parse(ddlOptions.SelectedValue);
                 filteredAnswers = filteredAnswers.Where(a => a.OptionId == selectedOptionId).ToList();
             }
 
+            // Filter by Answer Text
             if (!string.IsNullOrEmpty(txtSearch.Text))
             {
                 filteredAnswers = filteredAnswers.Where(a => a.AnswerText != null && a.AnswerText.Contains(txtSearch.Text)).ToList();
             }
 
+            // New Filter by Respondant ID
+            if (!string.IsNullOrEmpty(txtRespondantId.Text))
+            {
+                int respondentId;
+                if (int.TryParse(txtRespondantId.Text, out respondentId))
+                {
+                    filteredAnswers = filteredAnswers.Where(a => a.RespondantId == respondentId).ToList();
+                }
+            }
+
+            // New Filter by Session Date
+            if (!string.IsNullOrEmpty(txtSessionDate.Text))
+            {
+                DateTime sessionDate;
+                if (DateTime.TryParse(txtSessionDate.Text, out sessionDate))
+                {
+                    var respondentIdsWithSessionDate = sessions
+                        .Where(s => s.DateTime.Date == sessionDate.Date)
+                        .Select(s => s.Id)
+                        .ToList();
+
+                    filteredAnswers = filteredAnswers.Where(a => respondentIdsWithSessionDate.Contains(a.RespondantId)).ToList();
+                }
+            }
+
             // Return the list of respondent IDs that match the selected criteria
             return filteredAnswers.Select(a => a.RespondantId).Distinct().ToList();
+        }
+
+        protected void btnApplyFilters_Click(object sender, EventArgs e)
+        {
+            BindQuestionsToGridView();
+        }
+
+        protected void btnClearFilters_Click(object sender, EventArgs e)
+        {
+            // Clear all filter controls
+            ddlQuestions.SelectedIndex = 0;
+            ddlOptions.SelectedIndex = 0;
+            txtSearch.Text = string.Empty;
+            txtRespondantId.Text = string.Empty;
+            txtSessionDate.Text = string.Empty;
+
+            // Re-bind GridView with unfiltered data
+            BindQuestionsToGridView();
         }
 
 
@@ -367,97 +413,98 @@ namespace iHospital
 
 
         private void BindQuestionsToGridView()
+{
+    DataTable dt = new DataTable();
+
+    // Add Respondant ID as the first column
+    dt.Columns.Add("Respondant ID");
+
+    // Add columns for Session data
+    dt.Columns.Add("Session DateTime");
+    dt.Columns.Add("Session MacAddress");
+
+    // Add columns to DataTable based on questions
+    foreach (Question question in questions)
+    {
+        dt.Columns.Add(question.QuestionText);
+    }
+
+    // Apply filters to get the list of respondent IDs that match the selected criteria
+    var filteredRespondentIds = ApplyFilters();
+
+    // Create rows for each filtered respondent
+    foreach (var respondentId in filteredRespondentIds)
+    {
+        DataRow row = dt.NewRow();
+
+        // Add Respondant ID
+        row["Respondant ID"] = respondentId;
+
+        // Add Session data
+        if (sessions != null)
         {
-            DataTable dt = new DataTable();
-
-            // Add Respondant ID as the first column
-            dt.Columns.Add("Respondant ID");
-
-            // Add columns for Session data
-            dt.Columns.Add("Session DateTime");
-            dt.Columns.Add("Session MacAddress");
-
-            // Add columns to DataTable based on questions
-            foreach (Question question in questions)
+            var session = sessions.FirstOrDefault(s => s.Id == respondentId); 
+            if (session != null)
             {
-                dt.Columns.Add(question.QuestionText);
+                row["Session DateTime"] = session.DateTime;
+                row["Session MacAddress"] = session.MacAddress;
             }
-
-            // Apply filters to get the list of respondent IDs that match the selected criteria
-            var filteredRespondentIds = ApplyFilters();
-
-            // Create rows for each filtered respondent
-            foreach (var respondentId in filteredRespondentIds)
+            else
             {
-                DataRow row = dt.NewRow();
-
-                // Add Respondant ID
-                row["Respondant ID"] = respondentId;
-
-                // Add Session data
-                if (sessions != null)
-                {
-                    var session = sessions.FirstOrDefault(s => s.Id == respondentId); 
-                    if (session != null)
-                    {
-                        row["Session DateTime"] = session.DateTime;
-                        row["Session MacAddress"] = session.MacAddress;
-                    }
-                    else
-                    {
-                        row["Session DateTime"] = "N/A";
-                        row["Session MacAddress"] = "N/A";
-                    }
-                }
-                else
-                {
-                    row["Session DateTime"] = "N/A";
-                    row["Session MacAddress"] = "N/A";
-                }
-
-                // Fill in the answers for this respondent
-                foreach (Question question in questions)
-                {
-                    // Get the answers for this respondent and question
-                    var answers = answerList.Where(a => a.QuestionId == question.Id && a.RespondantId == respondentId).ToList();
-
-                    if (answers.Any())
-                    {
-                        var concatenatedAnswers = string.Join(", ", answers.Select(a =>
-                        {
-                            if (string.IsNullOrEmpty(a.AnswerText))
-                            {
-                                var option = options.FirstOrDefault(o => o.Id == a.OptionId);
-                                return option != null ? option.Option_Value : "No Answer";
-                            }
-                            else
-                            {
-                                return a.AnswerText;
-                            }
-                        }));
-                        row[question.QuestionText] = concatenatedAnswers;
-                    }
-                    else
-                    {
-                        row[question.QuestionText] = "No Answer";
-                    }
-                }
-
-                dt.Rows.Add(row);
-            }
-
-            // Bind DataTable to GridView
-            respondantGridView.DataSource = dt;
-            respondantGridView.DataBind();
-
-            // Ensure Respondant ID and Session columns are always visible
-            if (respondantGridView.Columns.Count > 0)
-            {
-                respondantGridView.Columns[0].Visible = true; // Respondant ID
-                respondantGridView.Columns[1].Visible = true; // Session DateTime
-                respondantGridView.Columns[2].Visible = true; // Session MacAddress
+                row["Session DateTime"] = "N/A";
+                row["Session MacAddress"] = "N/A";
             }
         }
+        else
+        {
+            row["Session DateTime"] = "N/A";
+            row["Session MacAddress"] = "N/A";
+        }
+
+        // Fill in the answers for this respondent
+        foreach (Question question in questions)
+        {
+            // Get the answers for this respondent and question
+            var answers = answerList.Where(a => a.QuestionId == question.Id && a.RespondantId == respondentId).ToList();
+
+            if (answers.Any())
+            {
+                var concatenatedAnswers = string.Join(", ", answers.Select(a =>
+                {
+                    if (string.IsNullOrEmpty(a.AnswerText))
+                    {
+                        var option = options.FirstOrDefault(o => o.Id == a.OptionId);
+                        return option != null ? option.Option_Value : "No Answer";
+                    }
+                    else
+                    {
+                        return a.AnswerText;
+                    }
+                }));
+                row[question.QuestionText] = concatenatedAnswers;
+            }
+            else
+            {
+                row[question.QuestionText] = "No Answer";
+            }
+        }
+
+        dt.Rows.Add(row);
+    }
+
+    // Bind DataTable to GridView
+    respondantGridView.DataSource = dt;
+    respondantGridView.DataBind();
+
+    // Ensure Respondant ID and Session columns are always visible
+    if (respondantGridView.Columns.Count > 0)
+    {
+        respondantGridView.Columns[0].Visible = true; // Respondant ID
+        respondantGridView.Columns[1].Visible = true; // Session DateTime
+        respondantGridView.Columns[2].Visible = true; // Session MacAddress
+    }
+}
+
 
 
         protected void btnSignOut_Click(object sender, EventArgs e)
@@ -470,6 +517,11 @@ namespace iHospital
             Response.Redirect("~/Homepage.aspx");
         }
 
+        protected void btnFilter_Click(object sender, EventArgs e)
+        {
+            // Apply filters and re-bind the GridView
+            BindQuestionsToGridView();
+        }
 
 
 

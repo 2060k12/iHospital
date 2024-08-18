@@ -3,7 +3,6 @@ html, body {
     margin: 0;
 }
 
-/* Survey Body */
 .survey-body {
     height: 100vh; 
     display: flex;

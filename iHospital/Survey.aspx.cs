@@ -374,14 +374,34 @@ namespace iHospital
             }
         }
 
-        protected void previousButton_Click(object sender, EventArgs e)
-        {
-            if (currentQuestionNumber > 0)
+       protected void previousButton_Click(object sender, EventArgs e)
+{
+
+            if(nextDependantQuestions.Count > 0 && currentDependentQuestionNumber > 0)
             {
+                nextDependantQuestions.Clear();
+                currentDependentQuestionNumber = 0;
+                DisplayCurrentQuestion();
+                int nextQuestionId = questions[currentQuestionNumber ].Id;
+                // Remove answers for the current question to prevent accumulation
+                answers.RemoveAll(a => a.QuestionId == nextQuestionId);
+                return;
+            }
+
+            // Ensure that currentQuestionNumber is greater than 0 to move to the previous question
+            if (currentQuestionNumber > 0 && nextDependantQuestions.Count == 0)
+            {
+                    int questionId = questions[currentQuestionNumber -1 ].Id;
+                    answers.RemoveAll(a => a.QuestionId == questionId);
+         
+
+                // Move to the previous question
                 currentQuestionNumber--;
                 DisplayCurrentQuestion();
             }
-        }
+
+}
+
 
         protected void nextButton_Click(object sender, EventArgs e)
         {
