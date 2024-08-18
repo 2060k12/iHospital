@@ -124,6 +124,14 @@ html, body {
             color: #007bff;
         }
 
+
+.error-label {
+    color: red; 
+    font-weight: bold; 
+   
+}
+
+
 /* Text Box */
 .text-box {
     width: 100%;

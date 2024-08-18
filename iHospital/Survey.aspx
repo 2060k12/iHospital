@@ -15,10 +15,13 @@
                     <asp:Label ID="infoLabel" runat="server" Text="Feel free to skip any question you are uncomfortable with" CssClass="info-label"></asp:Label>
                 </div>
                 <asp:PlaceHolder ID="surveyPlaceHolder" runat="server"></asp:PlaceHolder>
+               
                 <div class="controls-container">
                     <asp:Button ID="previousButton" runat="server" Text="Previous" OnClick="previousButton_Click" CausesValidation="false" UseSubmitBehavior="false" CssClass="btn btn-secondary" />
                     <asp:Button ID="nextButton" runat="server" Text="Next" OnClick="nextButton_Click" CausesValidation="false" UseSubmitBehavior="false" CssClass="btn btn-primary" />
+
                 </div>
+            <asp:Label ID="errorLbl" runat="server" Text="Error!" Visible="false" CssClass="error-label"></asp:Label>
             </div>
         </div>
     </form>

@@ -24,6 +24,11 @@
             <div>
                 <asp:Button ID="cancelButton" runat="server" CssClass="btn btn-cancel" Text="Back to Home Screen" OnClick="cancelButton_Click" />
             </div>
+
+
+            <asp:Label ID="errorLabel" runat="server" Text="Error!" Visible="false" 
+           style="color: red; font-weight: bold;"></asp:Label>
+
         </div>
     </form>
 </body>

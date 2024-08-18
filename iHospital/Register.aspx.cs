@@ -76,7 +76,20 @@ namespace iHospital
                 {
                     ID = "textBox_" + question.Id,
                       CssClass = "text-box"
+
                 };
+                if (question.QuestionType == "date")
+                {
+                    textBox.Attributes["placeholder"] = "Enter date (YYYY-MM-DD)";
+                }
+                else if (question.QuestionType == "email")
+                {
+                    textBox.Attributes["placeholder"] = "Enter your email";
+                }
+                else if (question.QuestionType == "number")
+                {
+                    textBox.Attributes["placeholder"] = "Enter number";
+                }
 
                 registerPlaceHolder.Controls.Add(label);
                 registerPlaceHolder.Controls.Add(new LiteralControl("<br/>"));
@@ -181,25 +194,78 @@ namespace iHospital
             int registeredId = registerUser();
             var answers = Session["Answers"] as List<Answer> ?? new List<Answer>();
 
-            // Add answers from questions
             foreach (Question question in questions)
             {
+                // Find the corresponding TextBox control
                 TextBox textBox = (TextBox)registerPlaceHolder.FindControl("textBox_" + question.Id);
+
                 if (textBox != null)
                 {
                     string answerText = textBox.Text;
+                    bool isValid = true;
+                    string errorMessage = string.Empty;
+
                     if (!string.IsNullOrEmpty(answerText))
+                    {
+                        // Validate based on the question type
+                        switch (question.QuestionType)
+                        {
+                            case "date":
+                                isValid = Validator.IsValidDate(answerText, out errorMessage);
+                                break;
+
+                            case "email":
+                                isValid = Validator.IsValidEmail(answerText, out errorMessage);
+                                break;
+
+                            case "number":
+                                isValid = Validator.IsValidNumber(answerText, out errorMessage);
+                                break;
+
+                            default:
+                                // Optionally handle other types if necessary
+                                break;
+                        }
+
+                      
+                    }
+                    else
+                    {
+                        errorLabel.Text = "Please fill out all the fields";
+                        errorLabel.Visible = true;
+                        return; // Exit the loop if the field is empty
+                    }
+
+
+                    if (isValid)
                     {
                         answers.Add(new Answer
                         {
                             QuestionId = question.Id,
                             AnswerText = answerText,
                             RespondantId = registeredId,
-                            OptionId = 0 //  OptionId is 0 for text answers
+                            OptionId = 0 // OptionId is 0 for text answers
                         });
                     }
+                    else
+                    {
+                        errorLabel.Text = errorMessage;
+                        errorLabel.Visible = true;
+                        return; // Exit the loop if there is an error
+                    }
+
+
+                }
+                else
+                {
+                    errorLabel.Text = "Some fields are missing.";
+                    errorLabel.Visible = true;
+                    return; // Exit the loop if any TextBox is not found
                 }
             }
+
+            // Hide the error label if no errors are found
+            errorLabel.Visible = false;
 
             // Save all answers to the database
             foreach (var item in answers)

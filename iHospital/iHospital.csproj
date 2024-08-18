@@ -155,6 +155,7 @@
     <Compile Include="Survey.aspx.designer.cs">
       <DependentUpon>Survey.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Validator.Cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="CSS\SurveyScreen.css" />

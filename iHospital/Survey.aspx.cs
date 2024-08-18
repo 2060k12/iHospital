@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -334,6 +335,7 @@ namespace iHospital
 
                     case "input":
                     case "email":
+                    case "number":
                         Label inputQuestionLabel = new Label
                         {
                             Text = currentQuestion.QuestionText,
@@ -388,14 +390,14 @@ namespace iHospital
                 return;
             }
 
-            // Ensure that currentQuestionNumber is greater than 0 to move to the previous question
+           
             if (currentQuestionNumber > 0 && nextDependantQuestions.Count == 0)
             {
                     int questionId = questions[currentQuestionNumber -1 ].Id;
                     answers.RemoveAll(a => a.QuestionId == questionId);
          
 
-                // Move to the previous question
+                // Move to the previous question 
                 currentQuestionNumber--;
                 DisplayCurrentQuestion();
             }
@@ -405,6 +407,59 @@ namespace iHospital
 
         protected void nextButton_Click(object sender, EventArgs e)
         {
+            bool hasError = false;
+
+            foreach (Control control in surveyPlaceHolder.Controls)
+            {
+                if (control is TextBox textBox)
+                {
+                    string errorMessage;
+
+                    switch (questions[currentQuestionNumber].QuestionType)
+                    {
+                        case "email":
+                            if (!Validator.IsValidEmail(textBox.Text, out errorMessage) || textBox.Text == "")
+                            {
+                                errorLbl.Text = errorMessage;
+                                errorLbl.Visible = true;
+                                hasError = true;
+                                break;  // Exit loop since there's an error
+                            }
+                            break;
+
+                        case "date":
+                            if (!Validator.IsValidDate(textBox.Text, out errorMessage) || textBox.Text == "")
+                            {
+                                errorLbl.Text = errorMessage;
+                                errorLbl.Visible = true;
+                                hasError = true;
+                                break;  // Exit loop since there's an error
+                            }
+                            break;
+
+                        case "number":
+                            if (!Validator.IsValidNumber(textBox.Text, out errorMessage) || textBox.Text == "")
+                            {
+                                errorLbl.Text = errorMessage;
+                                errorLbl.Visible = true;
+                                hasError = true;
+                                break;  // Exit loop since there's an error
+                            }
+                            break;
+                    }
+
+                    if (hasError)
+                    {
+                        return;  // Prevent moving to the next question if there's an error
+                    }
+                    else
+                    {
+                        errorLbl.Visible = false;
+                    }
+                }
+            }
+
+
             if (currentDependentQuestionNumber != 0 && nextDependantQuestions.Count > 0)
             {
 
