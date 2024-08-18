@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
+using System.Drawing;
 using System.Linq;
 using System.Net.Mail;
 using System.Net.NetworkInformation;
@@ -193,17 +194,23 @@ namespace iHospital
         {
             int registeredId = registerUser();
             var answers = Session["Answers"] as List<Answer> ?? new List<Answer>();
+            List<Answer> ansList = new List<Answer>();
 
             foreach (Question question in questions)
             {
+
+                
+
                 // Find the corresponding TextBox control
                 TextBox textBox = (TextBox)registerPlaceHolder.FindControl("textBox_" + question.Id);
 
                 if (textBox != null)
                 {
-                    string answerText = textBox.Text;
+
                     bool isValid = true;
                     string errorMessage = string.Empty;
+                    string answerText = textBox.Text;
+                   
 
                     if (!string.IsNullOrEmpty(answerText))
                     {
@@ -227,41 +234,47 @@ namespace iHospital
                                 break;
                         }
 
-                      
+                        if (isValid )
+                        {
+                            ansList.Add(new Answer
+                            {
+                                QuestionId = question.Id,
+                                AnswerText = answerText,
+                                RespondantId = registeredId,
+                                OptionId = 0 // OptionId is 0 for text answers
+                            });
+                        }
+                        else
+                        {
+                            errorLabel.Text = errorMessage;
+                            errorLabel.Visible = true;
+                            return; // Exit the loop if there is an error
+                        }
+
+
                     }
                     else
                     {
+                        ansList.Clear();
                         errorLabel.Text = "Please fill out all the fields";
                         errorLabel.Visible = true;
                         return; // Exit the loop if the field is empty
                     }
 
-
-                    if (isValid)
-                    {
-                        answers.Add(new Answer
-                        {
-                            QuestionId = question.Id,
-                            AnswerText = answerText,
-                            RespondantId = registeredId,
-                            OptionId = 0 // OptionId is 0 for text answers
-                        });
-                    }
-                    else
-                    {
-                        errorLabel.Text = errorMessage;
-                        errorLabel.Visible = true;
-                        return; // Exit the loop if there is an error
-                    }
-
-
                 }
                 else
                 {
+                    ansList.Clear();
                     errorLabel.Text = "Some fields are missing.";
                     errorLabel.Visible = true;
                     return; // Exit the loop if any TextBox is not found
                 }
+               
+            }
+
+            foreach (var item in ansList)
+            {
+                answers.Add(item);
             }
 
             // Hide the error label if no errors are found

@@ -418,32 +418,57 @@ namespace iHospital
                     switch (questions[currentQuestionNumber].QuestionType)
                     {
                         case "email":
-                            if (!Validator.IsValidEmail(textBox.Text, out errorMessage) || textBox.Text == "")
+                            if (!Validator.IsValidEmail(textBox.Text, out errorMessage))
                             {
-                                errorLbl.Text = errorMessage;
-                                errorLbl.Visible = true;
-                                hasError = true;
-                                break;  // Exit loop since there's an error
+                                if (textBox.Text == "")
+                                {
+                                    hasError = false;
+                                    break;
+                                }
+
+                                else
+                                {
+                                    errorLbl.Text = errorMessage;
+                                    errorLbl.Visible = true;
+                                    hasError = true;
+                                    break;  // Exit loop since there's an error
+                                }
                             }
                             break;
 
                         case "date":
-                            if (!Validator.IsValidDate(textBox.Text, out errorMessage) || textBox.Text == "")
+                            if (!Validator.IsValidDate(textBox.Text, out errorMessage) )
                             {
-                                errorLbl.Text = errorMessage;
-                                errorLbl.Visible = true;
-                                hasError = true;
-                                break;  // Exit loop since there's an error
+                                if (textBox.Text == "")
+                                {
+                                    hasError = false;
+                                    break;
+                                }
+
+                                else
+                                {
+                                    errorLbl.Text = errorMessage;
+                                    errorLbl.Visible = true;
+                                    hasError = true;
+                                    break;  // Exit loop since there's an error
+                                }
                             }
                             break;
 
                         case "number":
-                            if (!Validator.IsValidNumber(textBox.Text, out errorMessage) || textBox.Text == "")
+                            if (!Validator.IsValidNumber(textBox.Text, out errorMessage))
                             {
-                                errorLbl.Text = errorMessage;
-                                errorLbl.Visible = true;
-                                hasError = true;
-                                break;  // Exit loop since there's an error
+                                if (textBox.Text == "") {
+                                    hasError = false;
+                                    break; }
+
+                                else
+                                {
+                                    errorLbl.Text = errorMessage;
+                                    errorLbl.Visible = true;
+                                    hasError = true;
+                                    break;  // Exit loop since there's an error
+                                }
                             }
                             break;
                     }
