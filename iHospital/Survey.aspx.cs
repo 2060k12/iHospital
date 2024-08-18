@@ -17,6 +17,7 @@ namespace iHospital
         static int currentDependentQuestionNumber = 0;
 
 
+        // when the page loads for the  first time
         protected void Page_Load(object sender, EventArgs e)
         {
             myConnectionString = ConfigurationManager.ConnectionStrings["CurrentConnection"].ConnectionString;
@@ -33,6 +34,8 @@ namespace iHospital
             DisplayCurrentQuestion();
         }
 
+
+        // List of questions, options, answers, dependent questions and optional questions
         private List<Question> nextDependantQuestions
         {
             get
@@ -130,6 +133,9 @@ namespace iHospital
             }
         }
 
+
+        // current question number
+
         private int currentQuestionNumber
         {
             get
@@ -142,6 +148,7 @@ namespace iHospital
             }
         }
 
+        // function which loads the questions from the database
         private void LoadQuestions()
         {
             string connectionString = myConnectionString;
@@ -221,8 +228,12 @@ namespace iHospital
             }
         }
 
+
+        // function that will display the current question in the screen
         private void DisplayCurrentQuestion()
         {
+
+            // Hide the previous button if the current question is the first question
             if (currentQuestionNumber == 0)
             {
                 previousButton.Visible = false;
@@ -234,6 +245,7 @@ namespace iHospital
             surveyPlaceHolder.Controls.Clear();
 
 
+            // Display the current question
 
             if (currentQuestionNumber >= 0 && currentQuestionNumber < questions.Count)
             {
@@ -245,6 +257,8 @@ namespace iHospital
 
                     currentDependentQuestionNumber = currentQuestion.Id;
                 }
+
+                // Get the options for the current question
 
                 var items = options
                     .Where(o => o.QuestionId == currentQuestion.Id)
@@ -274,7 +288,7 @@ namespace iHospital
                             DataSource = items,
                             DataTextField = "Key",
                             DataValueField = "Value",
-                            CssClass = "radio-list" // Apply CSS class for styling
+                            CssClass = "radio-list" 
                         };
                         radioButtonList.DataBind();
                         surveyPlaceHolder.Controls.Add(chooseQuestionLabel);
@@ -294,7 +308,7 @@ namespace iHospital
                             DataSource = items,
                             DataTextField = "Key",
                             DataValueField = "Value",
-                            CssClass = "drop-down-list" // Apply CSS class for styling
+                            CssClass = "drop-down-list" 
                         };
                         dropDownList.DataBind();
                         surveyPlaceHolder.Controls.Add(dropDownQuestionLabel);
@@ -314,7 +328,7 @@ namespace iHospital
                             DataSource = items,
                             DataTextField = "Key",
                             DataValueField = "Value",
-                            CssClass = "check-box-list" // Apply CSS class for styling
+                            CssClass = "check-box-list" 
                         };
                         checkBoxList.DataBind();
                         surveyPlaceHolder.Controls.Add(checkBoxQuestionLabel);
@@ -345,7 +359,7 @@ namespace iHospital
                         TextBox inputTextBox = new TextBox
                         {
                             ID = "inputTextBox",
-                            CssClass = "text-box" // Apply CSS class for styling
+                            CssClass = "text-box" 
                         };
                         surveyPlaceHolder.Controls.Add(inputQuestionLabel);
                         surveyPlaceHolder.Controls.Add(inputTextBox);
@@ -361,13 +375,14 @@ namespace iHospital
                         TextBox dateTextBox = new TextBox
                         {
                             ID = "dateTextBox",
-                            CssClass = "date-text-box" // Apply CSS class for styling
+                            CssClass = "date-text-box" 
                         };
                         surveyPlaceHolder.Controls.Add(dateQuestionLabel);
                         surveyPlaceHolder.Controls.Add(dateTextBox);
                         break;
                 }
 
+                // Add the question control to the surveyPlaceHolder
 
                 if (questionControl != null)
                 {
@@ -376,7 +391,8 @@ namespace iHospital
             }
         }
 
-       protected void previousButton_Click(object sender, EventArgs e)
+        // function that will be called when the previous button is clicked
+        protected void previousButton_Click(object sender, EventArgs e)
 {
 
             if(nextDependantQuestions.Count > 0 && currentDependentQuestionNumber > 0)
@@ -404,7 +420,7 @@ namespace iHospital
 
 }
 
-
+        // function that will be called when the next button is clicked
         protected void nextButton_Click(object sender, EventArgs e)
         {
             bool hasError = false;
@@ -414,6 +430,8 @@ namespace iHospital
                 if (control is TextBox textBox)
                 {
                     string errorMessage;
+
+                    // Validate the input based on the question type
 
                     switch (questions[currentQuestionNumber].QuestionType)
                     {
@@ -484,12 +502,15 @@ namespace iHospital
                 }
             }
 
+            // Remove the current question from the nextDependantQuestions list
 
             if (currentDependentQuestionNumber != 0 && nextDependantQuestions.Count > 0)
             {
 
                 nextDependantQuestions.Remove(nextDependantQuestions.First());
             }
+
+            // Process the current answer
 
             foreach (Control control in surveyPlaceHolder.Controls)
             {
@@ -501,6 +522,8 @@ namespace iHospital
                 Session["Answers"] = answers;
                 Response.Redirect("~/Register.aspx");
             }
+
+            // Check if there are dependent questions for the current question
 
             foreach (Answer answer in answers)
             {
@@ -545,13 +568,16 @@ namespace iHospital
 
             }
 
+            // Move to the next question
+
             if (currentQuestionNumber < questions.Count && nextDependantQuestions.Count == 0)
             {
                 currentQuestionNumber++;
             }
-            currentDependentQuestionNumber = 0;
+            // Display the current question
 
             currentDependentQuestionNumber = 0;
+
             DisplayCurrentQuestion();
 
             foreach (var answer in answers)
@@ -559,9 +585,9 @@ namespace iHospital
                 System.Diagnostics.Debug.WriteLine($"QuestionId: {answer.QuestionId}, OptionId: {answer.OptionId}, AnswerText: {answer.AnswerText}");
             }
 
-           
-
         }
+
+        // function that will process the current answer
 
         private void ProcessCurrentAnswer(Control control)
         {

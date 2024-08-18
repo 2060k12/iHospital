@@ -119,7 +119,6 @@
     <Compile Include="Register.aspx.designer.cs">
       <DependentUpon>Register.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Repository\Repository.cs" />
     <Compile Include="UserControl\CheckListUserControl.ascx.cs">
       <DependentUpon>CheckListUserControl.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

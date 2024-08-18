@@ -17,6 +17,8 @@ namespace iHospital
     {
         string myConnectionString;
 
+
+        // Store the list of Respondants, Sessions, Questions, Options, and Answers in ViewState
         private List<Respondant> respondants
         {
             get
@@ -102,8 +104,11 @@ namespace iHospital
 
 
 
+        // loads the session information from the databse
 
         private void LoadSessions()
+
+
         {
             string connectionString = myConnectionString;
 
@@ -157,6 +162,8 @@ namespace iHospital
             }
             if (!IsPostBack)
             {
+                // Load the data from the database and display them in a grid view
+
                 LoadQuestions();
                 LoadOptions();
                 LoadAnswers();
@@ -168,6 +175,7 @@ namespace iHospital
 
 
 
+        // Load the questions from the database
         private void LoadQuestions()
         {
             string connectionString = myConnectionString;
@@ -204,6 +212,8 @@ namespace iHospital
             }
         }
 
+
+        // Load the options from the database
         private void LoadOptions()
         {
             string connectionString = myConnectionString;
@@ -239,6 +249,7 @@ namespace iHospital
             }
         }
 
+        // Load the answers from the database
         private void LoadAnswers()
         {
             string connectionString = myConnectionString;
@@ -276,6 +287,7 @@ namespace iHospital
             }
         }
 
+        // Populate the questions dropdown list
         private void PopulateQuestionsDropDown()
         {
             ddlQuestions.Items.Clear();
@@ -316,12 +328,7 @@ namespace iHospital
             BindQuestionsToGridView();
         }
 
-
-
-      
-
-
-
+        // Populate the options dropdown list based on the selected question
         private void PopulateOptionsDropDown(int questionId)
         {
             ddlOptions.Items.Clear();
@@ -336,6 +343,7 @@ namespace iHospital
         }
 
 
+        // Apply filters to the data and return the list of respondent that match the selected criteria
 
         private List<int> ApplyFilters()
         {

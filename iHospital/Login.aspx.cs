@@ -12,10 +12,11 @@ namespace iHospital
 {
     public partial class Login : System.Web.UI.Page
     {
-
         string myConnectionString ;
         protected void Page_Load(object sender, EventArgs e)
         {
+
+            // Get the connection string from the web.config file
 
             myConnectionString = ConfigurationManager.ConnectionStrings["CurrentConnection"].ConnectionString;
 
@@ -26,6 +27,8 @@ namespace iHospital
 
         }
 
+
+       
         protected void loginButton_Click(object sender, EventArgs e)
         {
             string username = txtUsername.Text.Trim();
@@ -43,6 +46,8 @@ namespace iHospital
             }
         }
 
+
+        // This method will validate the user credentials
         private bool ValidateUser(string username, string password)
         {
             bool isValid = false;

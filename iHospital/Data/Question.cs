@@ -7,6 +7,8 @@ namespace iHospital
 {
     [Serializable]
 
+
+    // This class will store the information of the question
     public class Question
     {
         public int Id { get; set; }

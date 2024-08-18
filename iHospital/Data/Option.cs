@@ -7,6 +7,8 @@ namespace iHospital.Data
 {
     [Serializable]
 
+
+    // This class will store the information of the option
     public class Option
     {
         public int Id { get; set; }

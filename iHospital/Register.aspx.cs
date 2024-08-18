@@ -299,6 +299,7 @@ namespace iHospital
         }
 
 
+        // This method will register a user, if the input value are not empty
         private int registerUser()
         {
             try
@@ -324,6 +325,9 @@ namespace iHospital
                         insertRespondantCmd.ExecuteNonQuery();
                     }
 
+
+
+                    // stores the mac address of this device
                     var macAddress = (
                         from nic in NetworkInterface.GetAllNetworkInterfaces()
                         where nic.OperationalStatus == OperationalStatus.Up
@@ -349,6 +353,8 @@ namespace iHospital
             return 0;
         }
 
+
+        // this function will send data to the database if the user is anonymous
         private int registerifAnonymous()
         {
 
@@ -412,6 +418,7 @@ namespace iHospital
         }
 
 
+        // if the user doesnt want to register they can simply click in this button
         protected void anonymousRegisterButton_Click(object sender, EventArgs e)
         {
             int registeredId = registerifAnonymous();
@@ -454,6 +461,8 @@ namespace iHospital
  
         }
 
+
+        // when pressed this button back to the homepage
         protected void cancelButton_Click(object sender, EventArgs e)
         {
             Response.Redirect("Homepage.aspx");

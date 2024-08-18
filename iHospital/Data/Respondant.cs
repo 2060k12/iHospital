@@ -6,6 +6,8 @@ using System.Web;
 namespace iHospital.Data
 {
     [Serializable]
+
+    // This class will store the information of the respondant
     public class Respondant
     {
         public int Id { get; set; }
