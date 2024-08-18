@@ -1,0 +1,164 @@
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+/* Survey Body */
+.survey-body {
+    height: 100vh; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f7f9fc; 
+}
+
+/* Survey Container */
+.survey-container {
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+}
+
+/* Question Label */
+.question-label {
+    font-weight: bold;
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 10px;
+    display: block;
+}
+
+/* Button Styles */
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    color: #fff;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background-color: #007bff;
+}
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+.btn-secondary {
+    background-color: #6c757d;
+}
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+/* Radio Button List */
+.radio-list {
+    margin-bottom: 20px;
+}
+
+    .radio-list input[type="radio"] {
+        margin-right: 10px;
+    }
+
+    .radio-list label {
+        font-size: 14px;
+        color: #555;
+        margin-right: 20px;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+
+        .radio-list label:hover {
+            color: #007bff;
+        }
+
+    /* Drop Down List */
+    .drop-down-list {
+        width: 100%;
+        max-width: 300px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        color: #333;
+        background-color: #fff;
+        transition: border-color 0.3s;
+    }
+
+    .drop-down-list:focus {
+        border-color: #007bff;
+        outline: none;
+    }
+
+/* Check Box List */
+.check-box-list {
+    margin-bottom: 20px;
+}
+
+    .check-box-list input[type="checkbox"] {
+        margin-right: 10px;
+    }
+
+    .check-box-list label {
+        font-size: 14px;
+        color: #555;
+        margin-right: 20px;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+
+        .check-box-list label:hover {
+            color: #007bff;
+        }
+
+/* Text Box */
+.text-box {
+    width: 100%;
+    max-width: 500px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #333;
+    background-color: #fff;
+    transition: border-color 0.3s;
+}
+
+    .text-box:focus {
+        border-color: #007bff;
+        outline: none;
+    }
+
+/* Date Text Box */
+.date-text-box {
+    width: 100%;
+    max-width: 300px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #333;
+    background-color: #fff;
+    transition: border-color 0.3s;
+}
+
+    .date-text-box:focus {
+        border-color: #007bff;
+        outline: none;
+    }

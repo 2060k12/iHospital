@@ -1,42 +1,25 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Survey.aspx.cs" Inherits="iHospital.WebForm1" %>
-<%--<%@ Register Src ="~/UserControl/CheckListUserControl.ascx" TagPrefix="uc" TagName="CheckList" %>
-<%@ Register Src ="~/UserControl/ChooseUserControl.ascx" TagPrefix="uc" TagName="ChooseList" %>
-<%@ Register Src ="~/UserControl/DropDownUserControl.ascx" TagPrefix="uc" TagName="DropDownList" %>
-<%@ Register Src ="~/UserControl/InputUserControl.ascx" TagPrefix="uc" TagName="InputList" %>--%>
-
 <!DOCTYPE html>
-
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
-    <title></title>
-            <link href="CSS/survey.css" rel="stylesheet" type="text/css" />
-
+    <title>Survey</title>
+    <link href="CSS/SurveyScreen.css" rel="stylesheet" type="text/css" />
+    <script src="JS/checkboxLimit.js" type="text/javascript"></script>
 </head>
 <body>
     <form id="form1" runat="server">
-        <div>
-
-            <div>
-
-          
-                <div>
-            <asp:Label ID="welcomeScreenLabel" runat="server" Text="Label">
-   Welcome to Survey Site
-</asp:Label>
+        <div class="survey-body">
+            <div class="survey-container">
+                <div class="header">
+                    <asp:Label ID="welcomeScreenLabel" runat="server" Text="Welcome to Survey Site" CssClass="question-label"></asp:Label>
+                    <asp:Label ID="infoLabel" runat="server" Text="Feel free to skip any question you are uncomfortable with" CssClass="info-label"></asp:Label>
                 </div>
-           
-
-                <div>
-                    <asp:Label ID="infoLabel" runat="server" Text="Feel free to skip any question You are unconfortable with"></asp:Label>
+                <asp:PlaceHolder ID="surveyPlaceHolder" runat="server"></asp:PlaceHolder>
+                <div class="controls-container">
+                    <asp:Button ID="previousButton" runat="server" Text="Previous" OnClick="previousButton_Click" CausesValidation="false" UseSubmitBehavior="false" CssClass="btn btn-secondary" />
+                    <asp:Button ID="nextButton" runat="server" Text="Next" OnClick="nextButton_Click" CausesValidation="false" UseSubmitBehavior="false" CssClass="btn btn-primary" />
                 </div>
-
-                  </div>
-            <asp:PlaceHolder ID="surveyPlaceHolder" runat="server"></asp:PlaceHolder>
-           
-          
-            <asp:Button ID="previousButton" runat="server" Text="Previous" OnClick="previousButton_Click" CausesValidation="false" UseSubmitBehavior="false"/>
-            <asp:Button ID="nextButton" runat="server" Text="Next" OnClick="nextButton_Click" CausesValidation="false" UseSubmitBehavior="False" />
-            
+            </div>
         </div>
     </form>
 </body>

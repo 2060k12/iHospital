@@ -69,9 +69,10 @@
   <ItemGroup>
     <Content Include="Admin.aspx" />
     <Content Include="CSS\login.css" />
+    <Content Include="CSS\Register.css" />
     <Content Include="CSS\styles.css" />
-    <Content Include="CSS\survey.css" />
     <Content Include="Homepage.aspx" />
+    <Content Include="JS\checkboxLimit.js" />
     <Content Include="Login.aspx" />
     <Content Include="Register.aspx" />
     <Content Include="UserControl\CheckListUserControl.ascx" />
@@ -156,6 +157,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="CSS\SurveyScreen.css" />
     <None Include="packages.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

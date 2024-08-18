@@ -68,12 +68,14 @@ namespace iHospital
                 Label label = new Label
                 {
                     Text = question.QuestionText,
-                    ID = "label_" + question.Id
+                    ID = "label_" + question.Id,
+                    CssClass = "question-label"
                 };
 
                 TextBox textBox = new TextBox
                 {
-                    ID = "textBox_" + question.Id
+                    ID = "textBox_" + question.Id,
+                      CssClass = "text-box"
                 };
 
                 registerPlaceHolder.Controls.Add(label);
@@ -210,6 +212,11 @@ namespace iHospital
                 Text = "Successfully Submitted"
             };
             registerPlaceHolder.Controls.Add(label);
+            answers.Clear();
+            Session["Answers"] = answers;
+            Response.Redirect("~/Homepage.aspx");
+
+
         }
 
 

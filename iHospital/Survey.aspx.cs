@@ -14,7 +14,7 @@ namespace iHospital
     {
         string myConnectionString;
         static int currentDependentQuestionNumber = 0;
-       
+
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -241,7 +241,7 @@ namespace iHospital
                 if (nextDependantQuestions.Count > 0)
                 {
                     currentQuestion = nextDependantQuestions.FirstOrDefault();
-                     
+
                     currentDependentQuestionNumber = currentQuestion.Id;
                 }
 
@@ -251,18 +251,29 @@ namespace iHospital
                     .ToList();
 
                 Control questionControl = null;
+                var questionType = currentQuestion.QuestionType;
 
-                switch (currentQuestion.QuestionType)
+                if (currentQuestion.QuestionType.Contains("select"))
+                {
+                    questionType = "select";
+                }
+
+                switch (questionType)
                 {
                     case "choose_one":
-                        Label chooseQuestionLabel = new Label { Text = currentQuestion.QuestionText };
+                        Label chooseQuestionLabel = new Label
+                        {
+                            Text = currentQuestion.QuestionText,
+                            CssClass = "question-label"
+                        };
+
                         RadioButtonList radioButtonList = new RadioButtonList
                         {
                             ID = "radioList",
                             DataSource = items,
                             DataTextField = "Key",
                             DataValueField = "Value",
-                            SelectedIndex = 0
+                            CssClass = "radio-list" // Apply CSS class for styling
                         };
                         radioButtonList.DataBind();
                         surveyPlaceHolder.Controls.Add(chooseQuestionLabel);
@@ -270,13 +281,19 @@ namespace iHospital
                         break;
 
                     case "drop_down":
-                        Label dropDownQuestionLabel = new Label { Text = currentQuestion.QuestionText };
+                        Label dropDownQuestionLabel = new Label
+                        {
+                            Text = currentQuestion.QuestionText,
+                            CssClass = "question-label"
+                        };
+
                         DropDownList dropDownList = new DropDownList
                         {
                             ID = "dropDownList",
                             DataSource = items,
                             DataTextField = "Key",
-                            DataValueField = "Value"
+                            DataValueField = "Value",
+                            CssClass = "drop-down-list" // Apply CSS class for styling
                         };
                         dropDownList.DataBind();
                         surveyPlaceHolder.Controls.Add(dropDownQuestionLabel);
@@ -284,34 +301,71 @@ namespace iHospital
                         break;
 
                     case "select":
-                        Label checkBoxQuestionLabel = new Label { Text = currentQuestion.QuestionText };
+                        Label checkBoxQuestionLabel = new Label
+                        {
+                            Text = currentQuestion.QuestionText,
+                            CssClass = "question-label"
+                        };
+
                         CheckBoxList checkBoxList = new CheckBoxList
                         {
                             ID = "optionsCheckBoxList",
                             DataSource = items,
                             DataTextField = "Key",
-                            DataValueField = "Value"
+                            DataValueField = "Value",
+                            CssClass = "check-box-list" // Apply CSS class for styling
                         };
                         checkBoxList.DataBind();
                         surveyPlaceHolder.Controls.Add(checkBoxQuestionLabel);
                         surveyPlaceHolder.Controls.Add(checkBoxList);
+
+                        // Adding a hidden field to store the maximum selection count
+                        var splitedQuestion = currentQuestion.QuestionType.Split('-');
+                        var maxField = splitedQuestion.Last();
+
+                        HiddenField maxSelectionsHiddenField = new HiddenField
+                        {
+                            ID = "maxSelectionsHiddenField",
+                            Value = maxField    // Maximum selection count
+                        };
+                        surveyPlaceHolder.Controls.Add(maxSelectionsHiddenField);
+
                         break;
 
                     case "input":
                     case "email":
-                        Label inputQuestionLabel = new Label { Text = currentQuestion.QuestionText };
-                        TextBox inputTextBox = new TextBox { ID = "inputTextBox" };
+                        Label inputQuestionLabel = new Label
+                        {
+                            Text = currentQuestion.QuestionText,
+                            CssClass = "question-label"
+                        };
+
+                        TextBox inputTextBox = new TextBox
+                        {
+                            ID = "inputTextBox",
+                            CssClass = "text-box" // Apply CSS class for styling
+                        };
                         surveyPlaceHolder.Controls.Add(inputQuestionLabel);
                         surveyPlaceHolder.Controls.Add(inputTextBox);
                         break;
 
                     case "date":
-                        Label dateQuestionLabel = new Label { Text = currentQuestion.QuestionText };
-                        TextBox dateTextBox = new TextBox { ID = "dateTextBox" };
+                        Label dateQuestionLabel = new Label
+                        {
+                            Text = currentQuestion.QuestionText,
+                            CssClass = "question-label"
+                        };
+
+                        TextBox dateTextBox = new TextBox
+                        {
+                            ID = "dateTextBox",
+                            CssClass = "date-text-box" // Apply CSS class for styling
+                        };
                         surveyPlaceHolder.Controls.Add(dateQuestionLabel);
                         surveyPlaceHolder.Controls.Add(dateTextBox);
                         break;
                 }
+
 
                 if (questionControl != null)
                 {
@@ -359,9 +413,19 @@ namespace iHospital
                         {
                             if (question.OptionID == answer.OptionId)
                             {
-                                nextDependantQuestions.Add(optionalQuestions.Where(q => q.Id == question.QuestionId).FirstOrDefault());
+                                // Check if the question is already in the nextDependantQuestions list
+                                var dependentQuestion = optionalQuestions.FirstOrDefault(q => q.Id == question.QuestionId);
+                                if (dependentQuestion != null)
+                                {
+                                    // Only add if it's not already present
+                                    if (!nextDependantQuestions.Any(q => q.Id == dependentQuestion.Id))
+                                    {
+                                        nextDependantQuestions.Add(dependentQuestion);
+                                    }
+                                }
                             }
                         }
+
                     }
                 }
                 else
@@ -370,7 +434,7 @@ namespace iHospital
                     {
                         foreach (DependentQuestion question in dependentQuestions)
                         {
-                            if (question.OptionID == answer.OptionId)
+                            if (question.OptionID == answer.OptionId )
                             {
                                 nextDependantQuestions.Add(optionalQuestions.Where(q => q.Id == question.QuestionId).FirstOrDefault());
                             }
@@ -378,20 +442,25 @@ namespace iHospital
                     }
                 }
 
-                
+
             }
 
-            if (currentQuestionNumber < questions.Count - 1 && nextDependantQuestions.Count ==0)
+            if (currentQuestionNumber < questions.Count && nextDependantQuestions.Count == 0)
             {
                 currentQuestionNumber++;
             }
-           
+            currentDependentQuestionNumber = 0;
+
+            currentDependentQuestionNumber = 0;
             DisplayCurrentQuestion();
 
             foreach (var answer in answers)
             {
                 System.Diagnostics.Debug.WriteLine($"QuestionId: {answer.QuestionId}, OptionId: {answer.OptionId}, AnswerText: {answer.AnswerText}");
             }
+
+           
+
         }
 
         private void ProcessCurrentAnswer(Control control)
@@ -492,3 +561,4 @@ namespace iHospital
         }
     }
 }
+
